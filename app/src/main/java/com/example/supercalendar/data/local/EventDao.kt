@@ -1,8 +1,9 @@
-package com.example.supercalendar.data
+package com.example.supercalendar.data.local
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.supercalendar.domain.model.Event
@@ -11,10 +12,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface EventDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(event: Event)
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(event: Event)
 
     @Delete
@@ -24,6 +25,6 @@ interface EventDao {
     suspend fun getEventById(id: Int): Event
 
     @Query("SELECT * FROM Event")
-    suspend fun getAll(): Flow<List<Event>>
+    fun getAll(): Flow<List<Event>>
 
 }

@@ -82,7 +82,6 @@ dependencies {
     implementation(libs.compose)
 
     //ROOM
-    val roomVersion = "2.6.1"
     implementation(libs.androidx.room.runtime)
     annotationProcessor(libs.androidx.room.compiler)
     ksp(libs.androidx.room.compiler)

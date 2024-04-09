@@ -14,6 +14,6 @@ data class Event(
     val time: String,
     val duration: String,
     //1->提醒，2->日程，3->生日，4->出行
-    val category: Int,
+    val category: Int = 1,
 
 )
