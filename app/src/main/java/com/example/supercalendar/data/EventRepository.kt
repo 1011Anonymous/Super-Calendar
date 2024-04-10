@@ -1,7 +1,7 @@
 package com.example.supercalendar.data
 
 import com.example.supercalendar.data.local.EventDao
-import com.example.supercalendar.domain.model.Event
+import com.example.supercalendar.domain.model.event.Event
 import kotlinx.coroutines.flow.Flow
 
 class EventRepository(

@@ -1,4 +1,4 @@
-package com.example.supercalendar.domain.model
+package com.example.supercalendar.domain.model.event
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
