@@ -59,6 +59,7 @@ fun HomeScreen(
                     if (visibleMonth != currentMonth) {
                         IconButton(onClick = {
                             homeViewModel.resetToCurrentMonth()
+                            homeViewModel.setIsGoBackToday(true)
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.ArrowBack,

@@ -58,7 +58,7 @@ import java.util.Locale
 @Composable
 fun CalendarScreen(
     viewModel: HolidayViewModel = hiltViewModel(),
-    homeViewModel: HomeViewModel
+    homeViewModel: HomeViewModel,
 ) {
     val currentMonth = remember {
         YearMonth.now()
@@ -78,23 +78,24 @@ fun CalendarScreen(
         outDateStyle = OutDateStyle.EndOfGrid,
     )
     val coroutineScope = rememberCoroutineScope()
-    val visibleMonth = rememberFirstMostVisibleMonth(state = state, viewportPercent = 90f)
+    val visibleMonthInScrolling =
+        rememberFirstMostVisibleMonth(state = state, viewportPercent = 90f)
     val today = remember { LocalDate.now() }
     var showDialog by remember { mutableStateOf(false) }
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
 
     val holidayList by viewModel.holidays.collectAsState()
-    val visibleMonthState = remember { mutableStateOf(visibleMonth) }
+    val visibleMonthState = remember { mutableStateOf(visibleMonthInScrolling) }
     val context = LocalContext.current
 
     LaunchedEffect(key1 = Unit) {
         viewModel.loadHolidaysForSurroundingMonths(currentMonth)
     }
 
-    LaunchedEffect(visibleMonth) {
-        if (visibleMonthState.value != visibleMonth) {
-            viewModel.loadHolidaysForSurroundingMonths(visibleMonth.yearMonth)
-            visibleMonthState.value = visibleMonth
+    LaunchedEffect(visibleMonthInScrolling) {
+        if (visibleMonthState.value != visibleMonthInScrolling) {
+            viewModel.loadHolidaysForSurroundingMonths(visibleMonthInScrolling.yearMonth)
+            visibleMonthState.value = visibleMonthInScrolling
         }
     }
 
@@ -114,15 +115,17 @@ fun CalendarScreen(
             .background(Color.White)
     ) {
         CalendarTitle(
-            currentMonth = visibleMonth.yearMonth,
+            currentMonth = visibleMonthInScrolling.yearMonth,
             goToPrevious = {
                 coroutineScope.launch {
                     state.animateScrollToMonth(state.firstVisibleMonth.yearMonth.previousMonth)
+                    homeViewModel.setVisibleMonth(state.firstVisibleMonth.yearMonth.previousMonth)
                 }
             },
             goToNext = {
                 coroutineScope.launch {
                     state.animateScrollToMonth(state.firstVisibleMonth.yearMonth.nextMonth)
+                    homeViewModel.setVisibleMonth(state.firstVisibleMonth.yearMonth.nextMonth)
                 }
             },
             onClick = {
@@ -155,6 +158,7 @@ fun CalendarScreen(
         confirmClicked = { month, year ->
             coroutineScope.launch {
                 state.scrollToMonth(YearMonth.of(year, month))
+                homeViewModel.setVisibleMonth(YearMonth.of(year, month))
                 showDialog = false
             }
         },
@@ -163,6 +167,12 @@ fun CalendarScreen(
         },
     )
 
+    LaunchedEffect(key1 = homeViewModel.isGoBackToday.value) {
+        if (homeViewModel.isGoBackToday.value) {
+            state.scrollToMonth(currentMonth)
+            homeViewModel.setIsGoBackToday(false)
+        }
+    }
 
 }
 
