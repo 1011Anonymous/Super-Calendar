@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.supercalendar.presentation.HolidayViewModel
 import com.example.supercalendar.presentation.HomeViewModel
-import com.example.supercalendar.presentation.components.CalendarScreen
+import com.example.supercalendar.presentation.components.CalendarView
 import java.time.YearMonth
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -100,7 +100,7 @@ fun HomeScreen(
                 .padding(innerPadding)
                 .fillMaxWidth()
         ) {
-            CalendarScreen(
+            CalendarView(
                 holidayViewModel,
                 homeViewModel
             )

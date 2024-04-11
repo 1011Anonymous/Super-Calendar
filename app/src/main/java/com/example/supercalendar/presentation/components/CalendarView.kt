@@ -56,7 +56,7 @@ import java.util.Calendar
 import java.util.Locale
 
 @Composable
-fun CalendarScreen(
+fun CalendarView(
     viewModel: HolidayViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel,
 ) {
