@@ -5,8 +5,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import okio.IOException
 import retrofit2.HttpException
+import javax.inject.Inject
 
-class HolidayRepositoryImpl(
+
+class HolidayRepositoryImpl @Inject constructor(
     private val apiService: HolidayApiService
 ) : HolidayRepository {
     override suspend fun getHolidayList(date: String): Flow<Result<List<Holiday>>> {
@@ -15,19 +17,19 @@ class HolidayRepositoryImpl(
                 apiService.getHolidayInfo(date = date)
             } catch (e: IOException) {
                 e.printStackTrace()
-                emit(Result.Error(message = "Error loading products"))
+                emit(Result.Error(message = "Error fetching holidaysInfo"))
                 return@flow
             } catch (e: HttpException) {
                 e.printStackTrace()
-                emit(Result.Error(message = "Error loading products"))
+                emit(Result.Error(message = "Error fetching holidaysInfo"))
                 return@flow
             }  catch (e: Exception) {
                 e.printStackTrace()
-                emit(Result.Error(message = "Error loading products"))
+                emit(Result.Error(message = "Error fetching holidaysInfo"))
                 return@flow
             }
 
-            emit(Result.Success(holidayInfo.result))
+            emit(Result.Success(holidayInfo.result.list))
         }
     }
 

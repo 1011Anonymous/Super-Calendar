@@ -1,7 +1,7 @@
 package com.example.supercalendar.domain.model.holiday
 
-data class HolidayInfo(
+data class HolidayInfoResponse(
     val code: Int,
     val msg: String,
-    val result: List<Holiday>
+    val result: HolidayResult
 )

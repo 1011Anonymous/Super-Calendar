@@ -5,4 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface HolidayRepository {
     suspend fun getHolidayList(date: String): Flow<Result<List<Holiday>>>
+
 }
