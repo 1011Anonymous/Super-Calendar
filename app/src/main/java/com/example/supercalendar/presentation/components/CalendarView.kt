@@ -78,8 +78,7 @@ fun CalendarView(
         outDateStyle = OutDateStyle.EndOfGrid,
     )
     val coroutineScope = rememberCoroutineScope()
-    val visibleMonthInScrolling =
-        rememberFirstMostVisibleMonth(state = state, viewportPercent = 90f)
+    val visibleMonthInScrolling = rememberFirstMostVisibleMonth(state = state, viewportPercent = 90f)
     val today = remember { LocalDate.now() }
     var showDialog by remember { mutableStateOf(false) }
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
@@ -119,13 +118,13 @@ fun CalendarView(
             goToPrevious = {
                 coroutineScope.launch {
                     state.animateScrollToMonth(state.firstVisibleMonth.yearMonth.previousMonth)
-                    homeViewModel.setVisibleMonth(state.firstVisibleMonth.yearMonth.previousMonth)
+                    //homeViewModel.setVisibleMonth(visibleMonthInScrolling.yearMonth.previousMonth)
                 }
             },
             goToNext = {
                 coroutineScope.launch {
                     state.animateScrollToMonth(state.firstVisibleMonth.yearMonth.nextMonth)
-                    homeViewModel.setVisibleMonth(state.firstVisibleMonth.yearMonth.nextMonth)
+                    //homeViewModel.setVisibleMonth(visibleMonthInScrolling.yearMonth.nextMonth)
                 }
             },
             onClick = {
@@ -148,7 +147,8 @@ fun CalendarView(
             },
             monthHeader = {
                 DaysOfWeekTitle(daysOfWeek = daysOfWeek)
-            }
+            },
+            //userScrollEnabled = false
         )
     }
     MonthPicker(
@@ -158,7 +158,7 @@ fun CalendarView(
         confirmClicked = { month, year ->
             coroutineScope.launch {
                 state.scrollToMonth(YearMonth.of(year, month))
-                homeViewModel.setVisibleMonth(YearMonth.of(year, month))
+                //homeViewModel.setVisibleMonth(YearMonth.of(year, month))
                 showDialog = false
             }
         },
@@ -172,6 +172,10 @@ fun CalendarView(
             state.scrollToMonth(currentMonth)
             homeViewModel.setIsGoBackToday(false)
         }
+    }
+
+    LaunchedEffect(key1 = visibleMonthInScrolling) {
+        homeViewModel.setVisibleMonth(visibleMonthInScrolling.yearMonth)
     }
 
 }

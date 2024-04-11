@@ -21,16 +21,19 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.supercalendar.presentation.HolidayViewModel
 import com.example.supercalendar.presentation.HomeViewModel
 import com.example.supercalendar.presentation.components.CalendarView
+import com.example.supercalendar.presentation.navigation.Screen
 import java.time.YearMonth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     holidayViewModel: HolidayViewModel = hiltViewModel(),
-    homeViewModel: HomeViewModel
+    homeViewModel: HomeViewModel,
+    navController: NavController
 ) {
     val visibleMonth = homeViewModel.visibleMonthState.value
     val currentMonth = YearMonth.now()
@@ -71,7 +74,7 @@ fun HomeScreen(
                     IconButton(onClick = { /*TODO*/ }) {
                         Icon(imageVector = Icons.Filled.List, contentDescription = "Events")
                     }
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { navController.navigate(Screen.SettingScreen.name) }) {
                         Icon(imageVector = Icons.Filled.Settings, contentDescription = "Settings")
                     }
                     IconButton(onClick = { /*TODO*/ }) {
