@@ -16,7 +16,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.supercalendar"
-        minSdk = 26
+        minSdk = 29
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -100,4 +100,13 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
+
+    //LocationService
+    implementation(libs.play.services.location)
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.maps)
+
+    //Full layout without Status Bar
+    implementation(libs.accompanist.systemuicontroller)
+
 }

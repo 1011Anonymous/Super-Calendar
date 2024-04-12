@@ -1,6 +1,8 @@
 package com.example.supercalendar.ui.theme
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -31,4 +33,24 @@ val Typography = Typography(
         letterSpacing = 0.5.sp
     )
     */
+)
+
+val taskTextStyle = TextStyle(
+    fontSize = 22.sp,
+    fontWeight = FontWeight.Medium
+)
+
+val topAppBarTextStyle = TextStyle(
+    fontSize = 26.sp,
+    fontFamily = FontFamily.Monospace
+)
+
+val smallTitleTextStyle = TextStyle(
+    fontSize = 14.sp,
+    fontFamily = FontFamily.Monospace,
+)
+
+val bigTitleTextStyle = TextStyle(
+    fontSize = 22.sp,
+    fontFamily = FontFamily.Monospace
 )
