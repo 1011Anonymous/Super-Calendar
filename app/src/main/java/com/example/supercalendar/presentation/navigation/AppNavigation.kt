@@ -4,6 +4,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -14,7 +15,7 @@ import com.google.android.gms.maps.model.LatLng
 
 @Composable
 fun AppNavigation(
-    homeViewModel: HomeViewModel,
+    homeViewModel: HomeViewModel = hiltViewModel(),
     currentLocation: LatLng
 ) {
     val navController = rememberNavController()
@@ -24,7 +25,7 @@ fun AppNavigation(
         startDestination = Screen.HomeScreen.name
     ) {
         composable(Screen.HomeScreen.name) {
-            HomeScreen(homeViewModel = homeViewModel, navController = navController, currentLocation = currentLocation)
+            HomeScreen(navController = navController, currentLocation = currentLocation)
         }
         composable(
             route = Screen.SettingScreen.name,
@@ -42,7 +43,6 @@ fun AppNavigation(
             }
         ) {
             SettingScreen(
-                homeViewModel = homeViewModel,
                 onBack = { navController.popBackStack() },
                 onContent = {},
                 onWeekStart = {},

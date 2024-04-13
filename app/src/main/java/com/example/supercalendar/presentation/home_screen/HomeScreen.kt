@@ -22,11 +22,19 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.supercalendar.constant.Const.Companion.LOADING
+import com.example.supercalendar.constant.STATE
 import com.example.supercalendar.presentation.HolidayViewModel
 import com.example.supercalendar.presentation.HomeViewModel
+import com.example.supercalendar.presentation.WeatherViewModel
 import com.example.supercalendar.presentation.components.CalendarView
 import com.example.supercalendar.presentation.navigation.Screen
 import com.google.android.gms.maps.model.LatLng
@@ -36,18 +44,27 @@ import java.time.YearMonth
 @Composable
 fun HomeScreen(
     holidayViewModel: HolidayViewModel = hiltViewModel(),
-    homeViewModel: HomeViewModel,
+    weatherViewModel: WeatherViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel(),
     navController: NavController,
     currentLocation: LatLng
 ) {
     val visibleMonth = homeViewModel.visibleMonthState.value
     val currentMonth = YearMonth.now()
 
+    var locationName by remember {
+        mutableStateOf("未知")
+    }
+
+//    LaunchedEffect(key1 = true) {
+//        weatherViewModel.getLocationByLatLng(currentLocation)
+//    }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "${currentLocation.latitude}/${currentLocation.longitude}")
+                    Text(text = locationName)
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -55,7 +72,19 @@ fun HomeScreen(
                 ),
                 navigationIcon = {
                     IconButton(onClick = {
-
+//                        when (weatherViewModel.state) {
+//                            STATE.LOADING -> {
+//                                locationName = LOADING
+//                            }
+//                            STATE.SUCCESS -> {
+//                                weatherViewModel.geoResponse.location?.let {
+//                                    if (it.size > 0) {
+//                                        locationName = if (it[0].adm2 == null) LOADING else it[0].adm2!!
+//                                    }
+//                                }
+//                            }
+//                            STATE.FAILED -> TODO()
+//                        }
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Refresh,
@@ -108,10 +137,7 @@ fun HomeScreen(
                 .padding(innerPadding)
                 .fillMaxWidth()
         ) {
-            CalendarView(
-                holidayViewModel,
-                homeViewModel
-            )
+            CalendarView()
         }
     }
 }

@@ -58,7 +58,7 @@ import java.util.Locale
 @Composable
 fun CalendarView(
     viewModel: HolidayViewModel = hiltViewModel(),
-    homeViewModel: HomeViewModel,
+    homeViewModel: HomeViewModel = hiltViewModel(),
 ) {
     val currentMonth = remember {
         YearMonth.now()

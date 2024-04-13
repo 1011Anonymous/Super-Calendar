@@ -109,4 +109,8 @@ dependencies {
     //Full layout without Status Bar
     implementation(libs.accompanist.systemuicontroller)
 
+    //Load Network image
+    implementation(libs.coil.compose)
+    implementation(libs.coil.svg)
+
 }

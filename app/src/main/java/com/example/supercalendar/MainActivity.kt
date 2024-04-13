@@ -38,7 +38,6 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val homeViewModel: HomeViewModel by viewModels()
 
     private val permissions = arrayOf(
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -107,7 +106,6 @@ class MainActivity : ComponentActivity() {
                         currentLocation = currentLocation
                     )
                     AppNavigation(
-                        homeViewModel = homeViewModel,
                         currentLocation = currentLocation
                     )
                 }

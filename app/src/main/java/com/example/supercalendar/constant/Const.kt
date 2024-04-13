@@ -19,5 +19,8 @@ class Const {
             "十一月",
             "十二月"
         )
+        const val NA = "?"
+        const val UNKNOWN = "未知"
+        const val LOADING = "等待中"
     }
 }

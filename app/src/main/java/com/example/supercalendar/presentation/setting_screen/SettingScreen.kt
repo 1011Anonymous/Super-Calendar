@@ -32,6 +32,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.supercalendar.presentation.HomeViewModel
 import com.example.supercalendar.ui.theme.bigTitleTextStyle
 import com.example.supercalendar.ui.theme.smallTitleTextStyle
@@ -39,7 +40,7 @@ import com.example.supercalendar.ui.theme.smallTitleTextStyle
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingScreen(
-    homeViewModel: HomeViewModel,
+    homeViewModel: HomeViewModel = hiltViewModel(),
     onBack: () -> Unit,
     onContent: () -> Unit,
     onWeekStart: () -> Unit,
