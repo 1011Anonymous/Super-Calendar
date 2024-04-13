@@ -19,6 +19,7 @@ class WeatherViewModel : ViewModel() {
     var errorMessage: String by mutableStateOf("")
 
     var locationName by mutableStateOf(UNKNOWN)
+    var locationId by mutableStateOf("")
 
     fun getLocationByLatLng(latLng: LatLng) {
         viewModelScope.launch {
@@ -28,13 +29,36 @@ class WeatherViewModel : ViewModel() {
                 "%.2f",
                 latLng.latitude
             )
-            Log.d("LocationVM", "Requesting location for: $latLngToString")
             try {
                 val apiResponse = apiService.getLocation(latLngToString)
                 geoResponse = apiResponse
                 geoResponse.location?.let { locationArrayList ->
                     if (locationArrayList.size > 0) {
                         locationArrayList[0].adm2?.let { locationName = it }
+                        locationArrayList[0].id?.let { locationId = it }
+                    }
+                }
+                state = STATE.SUCCESS
+            } catch (e: Exception) {
+                errorMessage = e.message!!.toString()
+                state = STATE.FAILED
+            }
+            Log.d("LocationName", "LocationName: $locationName")
+            Log.d("LocationID", "LocationId: $locationId")
+        }
+    }
+
+    fun getLocationByName(name: String) {
+        viewModelScope.launch {
+            state = STATE.LOADING
+            val apiService = GeoRetrofitClient.getInstance()
+            Log.d("LocationID", "LocationId: $locationId")
+            try {
+                val apiResponse = apiService.getLocation(name)
+                geoResponse = apiResponse
+                geoResponse.location?.let { locationArrayList ->
+                    if (locationArrayList.size > 0) {
+                        locationArrayList[0].id?.let { locationId = it }
                     }
                 }
                 state = STATE.SUCCESS
@@ -44,4 +68,6 @@ class WeatherViewModel : ViewModel() {
             }
         }
     }
+
+
 }
