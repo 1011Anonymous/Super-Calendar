@@ -1,14 +1,16 @@
 package com.example.supercalendar.presentation.home_screen
 
+import android.Manifest
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
@@ -28,12 +30,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.supercalendar.constant.Const.Companion.LOADING
+import com.example.supercalendar.constant.Const.Companion.UNKNOWN
 import com.example.supercalendar.constant.STATE
-import com.example.supercalendar.presentation.HolidayViewModel
 import com.example.supercalendar.presentation.HomeViewModel
+import com.example.supercalendar.presentation.LocationViewModel
 import com.example.supercalendar.presentation.WeatherViewModel
 import com.example.supercalendar.presentation.components.CalendarView
 import com.example.supercalendar.presentation.navigation.Screen
@@ -43,28 +47,24 @@ import java.time.YearMonth
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    holidayViewModel: HolidayViewModel = hiltViewModel(),
     weatherViewModel: WeatherViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel = hiltViewModel(),
+    locationViewModel: LocationViewModel,
     navController: NavController,
-    currentLocation: LatLng
+    locationPermissionRequest: ActivityResultLauncher<Array<String>>
 ) {
     val visibleMonth = homeViewModel.visibleMonthState.value
     val currentMonth = YearMonth.now()
 
     var locationName by remember {
-        mutableStateOf("未知")
+        mutableStateOf(UNKNOWN)
     }
-
-//    LaunchedEffect(key1 = true) {
-//        weatherViewModel.getLocationByLatLng(currentLocation)
-//    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = locationName)
+                    
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -72,19 +72,14 @@ fun HomeScreen(
                 ),
                 navigationIcon = {
                     IconButton(onClick = {
-//                        when (weatherViewModel.state) {
-//                            STATE.LOADING -> {
-//                                locationName = LOADING
-//                            }
-//                            STATE.SUCCESS -> {
-//                                weatherViewModel.geoResponse.location?.let {
-//                                    if (it.size > 0) {
-//                                        locationName = if (it[0].adm2 == null) LOADING else it[0].adm2!!
-//                                    }
-//                                }
-//                            }
-//                            STATE.FAILED -> TODO()
-//                        }
+
+                        locationPermissionRequest.launch(
+                            arrayOf(
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                            )
+                        )
+
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Refresh,
@@ -138,6 +133,11 @@ fun HomeScreen(
                 .fillMaxWidth()
         ) {
             CalendarView()
+            
+            Spacer(modifier = Modifier.height(10.dp))
+            
+            Text(text = String.format("%.2f", locationViewModel.currentLocation.value.longitude))
+            Text(text = String.format("%.2f", locationViewModel.currentLocation.value.latitude))
         }
     }
 }

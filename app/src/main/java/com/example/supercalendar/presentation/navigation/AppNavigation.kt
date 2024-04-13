@@ -1,5 +1,6 @@
 package com.example.supercalendar.presentation.navigation
 
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -9,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.supercalendar.presentation.HomeViewModel
+import com.example.supercalendar.presentation.LocationViewModel
 import com.example.supercalendar.presentation.home_screen.HomeScreen
 import com.example.supercalendar.presentation.setting_screen.SettingScreen
 import com.google.android.gms.maps.model.LatLng
@@ -16,7 +18,8 @@ import com.google.android.gms.maps.model.LatLng
 @Composable
 fun AppNavigation(
     homeViewModel: HomeViewModel = hiltViewModel(),
-    currentLocation: LatLng
+    locationViewModel: LocationViewModel,
+    locationPermissionRequest: ActivityResultLauncher<Array<String>>
 ) {
     val navController = rememberNavController()
 
@@ -25,7 +28,11 @@ fun AppNavigation(
         startDestination = Screen.HomeScreen.name
     ) {
         composable(Screen.HomeScreen.name) {
-            HomeScreen(navController = navController, currentLocation = currentLocation)
+            HomeScreen(
+                navController = navController,
+                locationViewModel = locationViewModel,
+                locationPermissionRequest = locationPermissionRequest
+            )
         }
         composable(
             route = Screen.SettingScreen.name,
