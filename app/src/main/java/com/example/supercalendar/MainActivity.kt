@@ -12,6 +12,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import com.example.supercalendar.presentation.LocationViewModel
+import com.example.supercalendar.presentation.WeatherViewModel
 import com.example.supercalendar.presentation.navigation.AppNavigation
 import com.example.supercalendar.ui.theme.SuperCalendarTheme
 import com.example.supercalendar.utils.LocationManager
@@ -22,6 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val locationViewModel: LocationViewModel by viewModels()
+    private val weatherViewModel:WeatherViewModel by viewModels()
 
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -34,6 +36,7 @@ class MainActivity : ComponentActivity() {
                         LocationManager.removeCallBack(this@MainActivity)
 
                         locationViewModel.currentLocation.value = LatLng(latitude, longitude)
+                        weatherViewModel.getLocationByLatLng(locationViewModel.currentLocation.value)
                     })
             }
 
@@ -44,6 +47,7 @@ class MainActivity : ComponentActivity() {
                         LocationManager.removeCallBack(this@MainActivity)
 
                         locationViewModel.currentLocation.value = LatLng(latitude, longitude)
+                        weatherViewModel.getLocationByLatLng(locationViewModel.currentLocation.value)
                     })
             }
 
@@ -74,6 +78,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     AppNavigation(
                         locationViewModel = locationViewModel,
+                        weatherViewModel = weatherViewModel,
                         locationPermissionRequest = locationPermissionRequest
                     )
                 }

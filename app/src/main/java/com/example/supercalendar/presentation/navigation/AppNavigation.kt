@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.supercalendar.presentation.HomeViewModel
 import com.example.supercalendar.presentation.LocationViewModel
+import com.example.supercalendar.presentation.WeatherViewModel
 import com.example.supercalendar.presentation.home_screen.HomeScreen
 import com.example.supercalendar.presentation.setting_screen.SettingScreen
 import com.google.android.gms.maps.model.LatLng
@@ -19,6 +20,7 @@ import com.google.android.gms.maps.model.LatLng
 fun AppNavigation(
     homeViewModel: HomeViewModel = hiltViewModel(),
     locationViewModel: LocationViewModel,
+    weatherViewModel: WeatherViewModel,
     locationPermissionRequest: ActivityResultLauncher<Array<String>>
 ) {
     val navController = rememberNavController()
@@ -31,7 +33,8 @@ fun AppNavigation(
             HomeScreen(
                 navController = navController,
                 locationViewModel = locationViewModel,
-                locationPermissionRequest = locationPermissionRequest
+                locationPermissionRequest = locationPermissionRequest,
+                weatherViewModel = weatherViewModel
             )
         }
         composable(

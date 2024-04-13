@@ -1,5 +1,6 @@
 package com.example.supercalendar.retrofit_client
 
+import com.example.supercalendar.constant.Const.Companion.GEO_BASE_URL
 import com.example.supercalendar.constant.Const.Companion.WEATHER_API_KEY
 import com.example.supercalendar.network.geo.GeoApiService
 import retrofit2.Retrofit
@@ -11,7 +12,7 @@ class GeoRetrofitClient {
         fun getInstance(): GeoApiService {
             if (apiService == null) {
                 apiService = Retrofit.Builder()
-                    .baseUrl(WEATHER_API_KEY)
+                    .baseUrl(GEO_BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
                     .create(GeoApiService::class.java)

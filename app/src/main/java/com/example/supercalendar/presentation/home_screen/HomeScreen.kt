@@ -47,7 +47,7 @@ import java.time.YearMonth
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    weatherViewModel: WeatherViewModel = hiltViewModel(),
+    weatherViewModel: WeatherViewModel,
     homeViewModel: HomeViewModel = hiltViewModel(),
     locationViewModel: LocationViewModel,
     navController: NavController,
@@ -56,15 +56,12 @@ fun HomeScreen(
     val visibleMonth = homeViewModel.visibleMonthState.value
     val currentMonth = YearMonth.now()
 
-    var locationName by remember {
-        mutableStateOf(UNKNOWN)
-    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    
+                    Text(text = weatherViewModel.locationName)
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
