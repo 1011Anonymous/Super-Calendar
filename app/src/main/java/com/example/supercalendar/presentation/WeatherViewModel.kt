@@ -82,8 +82,8 @@ class WeatherViewModel : ViewModel() {
                 geoResponse = apiResponse
                 geoResponse.location?.let { locationArrayList ->
                     if (locationArrayList.size > 0) {
-                        locationArrayList[0].adm2?.let { locationName = it }
                         locationArrayList[0].id?.let { locationId = it }
+                        locationArrayList[0].adm2?.let { locationName = it }
                         onSuccess()
                         state = STATE.SUCCESS
                     } else {

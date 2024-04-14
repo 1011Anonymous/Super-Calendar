@@ -47,7 +47,8 @@ fun WeatherCard(
         "轻度污染" -> Color(255, 126, 0)
         "中度污染" -> Color(255, 0, 0)
         "重度污染" -> Color(153, 0, 76)
-        else -> Color(126, 0, 35)
+        "严重污染" -> Color(126, 0, 35)
+        else -> Color.Gray
     }
 
     Card(
@@ -98,7 +99,7 @@ fun WeatherCard(
 
                         Text(
                             text = "${weatherViewModel.aqi}${weatherViewModel.category}",
-                            color = Color.White,
+                            color = Color.Black,
                             fontSize = 12.sp,
                             modifier = Modifier.background(airColor)
                         )
