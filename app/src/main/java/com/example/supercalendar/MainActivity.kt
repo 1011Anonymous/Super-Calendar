@@ -2,6 +2,7 @@ package com.example.supercalendar
 
 import android.Manifest
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -11,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import com.example.supercalendar.constant.STATE
 import com.example.supercalendar.presentation.LocationViewModel
 import com.example.supercalendar.presentation.WeatherViewModel
 import com.example.supercalendar.presentation.navigation.AppNavigation
@@ -37,6 +39,21 @@ class MainActivity : ComponentActivity() {
 
                         locationViewModel.currentLocation.value = LatLng(latitude, longitude)
                         weatherViewModel.getLocationByLatLng(locationViewModel.currentLocation.value)
+
+                        when (weatherViewModel.state) {
+                            STATE.LOADING -> {
+                                Log.d("Fetching LocationID", "Loading")
+                            }
+                            STATE.SUCCESS -> {
+                                weatherViewModel.getCurrentWeather(weatherViewModel.locationId)
+                                weatherViewModel.getDailyWeather(weatherViewModel.locationId)
+                                weatherViewModel.getHourlyWeather(weatherViewModel.locationId)
+                                weatherViewModel.getAir(weatherViewModel.locationId)
+                            }
+                            STATE.FAILED -> {
+                                Log.d("Fetch LocationID Failed", weatherViewModel.errorMessage)
+                            }
+                        }
                     })
             }
 
@@ -48,6 +65,21 @@ class MainActivity : ComponentActivity() {
 
                         locationViewModel.currentLocation.value = LatLng(latitude, longitude)
                         weatherViewModel.getLocationByLatLng(locationViewModel.currentLocation.value)
+
+                        when (weatherViewModel.state) {
+                            STATE.LOADING -> {
+                                Log.d("Fetching LocationID", "Loading")
+                            }
+                            STATE.SUCCESS -> {
+                                weatherViewModel.getCurrentWeather(weatherViewModel.locationId)
+                                weatherViewModel.getDailyWeather(weatherViewModel.locationId)
+                                weatherViewModel.getHourlyWeather(weatherViewModel.locationId)
+                                weatherViewModel.getAir(weatherViewModel.locationId)
+                            }
+                            STATE.FAILED -> {
+                                Log.d("Fetch LocationID Failed", weatherViewModel.errorMessage)
+                            }
+                        }
                     })
             }
 

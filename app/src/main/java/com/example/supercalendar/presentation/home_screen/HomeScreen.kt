@@ -40,6 +40,7 @@ import com.example.supercalendar.presentation.HomeViewModel
 import com.example.supercalendar.presentation.LocationViewModel
 import com.example.supercalendar.presentation.WeatherViewModel
 import com.example.supercalendar.presentation.components.CalendarView
+import com.example.supercalendar.presentation.components.WeatherCard
 import com.example.supercalendar.presentation.navigation.Screen
 import com.google.android.gms.maps.model.LatLng
 import java.time.YearMonth
@@ -133,8 +134,9 @@ fun HomeScreen(
             
             Spacer(modifier = Modifier.height(10.dp))
             
-            Text(text = String.format("%.2f", locationViewModel.currentLocation.value.longitude))
-            Text(text = String.format("%.2f", locationViewModel.currentLocation.value.latitude))
+//            Text(text = String.format("%.2f", locationViewModel.currentLocation.value.longitude))
+//            Text(text = String.format("%.2f", locationViewModel.currentLocation.value.latitude))
+            WeatherCard(navController = navController, weatherViewModel = weatherViewModel)
         }
     }
 }
