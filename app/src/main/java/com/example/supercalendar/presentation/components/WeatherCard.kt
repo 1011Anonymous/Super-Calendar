@@ -1,16 +1,19 @@
 package com.example.supercalendar.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +31,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
+import com.example.supercalendar.constant.STATE
 import com.example.supercalendar.presentation.WeatherViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,7 +40,8 @@ fun WeatherCard(
     navController: NavController,
     weatherViewModel: WeatherViewModel
 ) {
-    var airColor = when (weatherViewModel.category) {
+
+    val airColor = when (weatherViewModel.category) {
         "优" -> Color(0, 228, 0)
         "良" -> Color(255, 255, 0)
         "轻度污染" -> Color(255, 126, 0)
@@ -54,87 +59,97 @@ fun WeatherCard(
             .padding(16.dp),
 
         ) {
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = "${weatherViewModel.currentTemp}°",
-                modifier = Modifier.padding(8.dp),
-                color = MaterialTheme.colorScheme.inversePrimary,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-            )
+        if (weatherViewModel.state == STATE.LOADING || weatherViewModel.state == STATE.FAILED) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else {
 
-            Column {
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Text(
-                    text = "${weatherViewModel.tempMin0}°/${weatherViewModel.tempMax0}°",
-                    color = Color.Gray,
-                    modifier = Modifier.padding(top = 8.dp),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
+                    text = "${weatherViewModel.currentTemp}°",
+                    modifier = Modifier.padding(8.dp),
+                    color = MaterialTheme.colorScheme.inversePrimary,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
                 )
 
-                Row {
+                Column {
                     Text(
-                        text = weatherViewModel.currentText,
-                        modifier = Modifier.padding(end = 4.dp),
+                        text = "${weatherViewModel.tempMin0}°/${weatherViewModel.tempMax0}°",
+                        color = Color.Gray,
+                        modifier = Modifier.padding(top = 8.dp),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
                     )
 
+                    Row {
+                        Text(
+                            text = weatherViewModel.currentText,
+                            modifier = Modifier.padding(end = 4.dp),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Text(
+                            text = "${weatherViewModel.aqi}${weatherViewModel.category}",
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            modifier = Modifier.background(airColor)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Column {
                     Text(
-                        text = "${weatherViewModel.aqi}${weatherViewModel.category}",
-                        color = Color.White,
+                        text = weatherViewModel.locationName,
+                        modifier = Modifier.padding(top = 8.dp, start = 50.dp),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "${weatherViewModel.currentWindDir}${weatherViewModel.currentWindScale}" + "级" + "|" + "湿度${weatherViewModel.currentHumidity}%",
                         fontSize = 12.sp,
-                        modifier = Modifier.background(airColor)
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Gray
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.weight(1f))
-
-            Column {
-                Text(
-                    text = weatherViewModel.locationName,
-                    modifier = Modifier.padding(top = 8.dp, start = 50.dp),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = MaterialTheme.colorScheme.primaryContainer)
+            ) {
+                WeatherInfoSegment(
+                    day = "明天",
+                    weatherCondition = weatherViewModel.text1,
+                    wind = "${weatherViewModel.windDir1}${weatherViewModel.windScale1}" + "级",
+                    temperature = "${weatherViewModel.tempMin1}°/${weatherViewModel.tempMax1}°",
+                    iconID = weatherViewModel.icon1
                 )
-                Text(
-                    text = "${weatherViewModel.currentWindDir}${weatherViewModel.currentWindScale}" + "级" + "|" + "湿度${weatherViewModel.currentHumidity}%",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Gray
+                Divider(
+                    color = Color.White,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(1.dp)
+                        .padding(vertical = 4.dp)
+                )
+                WeatherInfoSegment(
+                    day = "后天",
+                    weatherCondition = weatherViewModel.text2,
+                    wind = "${weatherViewModel.windDir2}${weatherViewModel.windScale2}" + "级",
+                    temperature = "${weatherViewModel.tempMin2}°/${weatherViewModel.tempMax2}°",
+                    iconID = weatherViewModel.icon2
                 )
             }
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.primaryContainer)
-        ) {
-            WeatherInfoSegment(
-                day = "明天",
-                weatherCondition = weatherViewModel.text1,
-                wind = "${weatherViewModel.windDir1}${weatherViewModel.windScale1}" + "级",
-                temperature = "${weatherViewModel.tempMin1}°/${weatherViewModel.tempMax1}°",
-                iconID = weatherViewModel.icon1
-            )
-            Divider(
-                color = Color.White,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(1.dp)
-                    .padding(vertical = 4.dp)
-            )
-            WeatherInfoSegment(
-                day = "后天",
-                weatherCondition = weatherViewModel.text2,
-                wind = "${weatherViewModel.windDir2}${weatherViewModel.windScale2}" + "级",
-                temperature = "${weatherViewModel.tempMin2}°/${weatherViewModel.tempMax2}°",
-                iconID = weatherViewModel.icon2
-            )
         }
     }
 

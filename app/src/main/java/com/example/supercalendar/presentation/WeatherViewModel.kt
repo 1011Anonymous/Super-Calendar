@@ -69,7 +69,7 @@ class WeatherViewModel : ViewModel() {
     var pm25 by mutableStateOf(LOADING)
 
 
-    fun getLocationByLatLng(latLng: LatLng) {
+    fun getLocationByLatLng(latLng: LatLng, onSuccess: () -> Unit, onFailure: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             state = STATE.LOADING
             val apiService = GeoRetrofitClient.getInstance()
@@ -84,12 +84,20 @@ class WeatherViewModel : ViewModel() {
                     if (locationArrayList.size > 0) {
                         locationArrayList[0].adm2?.let { locationName = it }
                         locationArrayList[0].id?.let { locationId = it }
+                        onSuccess()
+                        state = STATE.SUCCESS
+                    } else {
+                        onFailure()
+                        state = STATE.FAILED
                     }
+                } ?: run {
+                    onFailure()
+                    state = STATE.FAILED
                 }
-                state = STATE.SUCCESS
             } catch (e: Exception) {
                 errorMessage = e.message!!.toString()
                 state = STATE.FAILED
+                onFailure()
             }
             Log.d("LocationName", "LocationName: $locationName")
             Log.d("LocationID", "LocationId: $locationId")

@@ -12,7 +12,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import com.example.supercalendar.constant.STATE
 import com.example.supercalendar.presentation.LocationViewModel
 import com.example.supercalendar.presentation.WeatherViewModel
 import com.example.supercalendar.presentation.navigation.AppNavigation
@@ -42,24 +41,14 @@ class MainActivity : ComponentActivity() {
 
                         locationViewModel.currentLocation.value = LatLng(latitude, longitude)
 
-                        weatherViewModel.getLocationByLatLng(locationViewModel.currentLocation.value)
-
-                        when (weatherViewModel.state) {
-                            STATE.LOADING -> {
-                                Log.d("Fetching LocationID", "Loading")
+                        weatherViewModel.getLocationByLatLng(
+                            latLng = locationViewModel.currentLocation.value,
+                            onSuccess = { fetchAll() },
+                            onFailure = {
+                                Log.d("API Fetch", "Failed to fetch location")
                             }
+                        )
 
-                            STATE.SUCCESS -> {
-                                weatherViewModel.getCurrentWeather(weatherViewModel.locationId)
-                                weatherViewModel.getDailyWeather(weatherViewModel.locationId)
-                                weatherViewModel.getHourlyWeather(weatherViewModel.locationId)
-                                weatherViewModel.getAir(weatherViewModel.locationId)
-                            }
-
-                            STATE.FAILED -> {
-                                Log.d("Fetch LocationID Failed", weatherViewModel.errorMessage)
-                            }
-                        }
 
                     })
             }
@@ -71,7 +60,10 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun fetchAll() {
-
+        weatherViewModel.getCurrentWeather(weatherViewModel.locationId)
+        weatherViewModel.getDailyWeather(weatherViewModel.locationId)
+        weatherViewModel.getHourlyWeather(weatherViewModel.locationId)
+        weatherViewModel.getAir(weatherViewModel.locationId)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
