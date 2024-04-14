@@ -25,61 +25,42 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val locationViewModel: LocationViewModel by viewModels()
-    private val weatherViewModel:WeatherViewModel by viewModels()
+    private val weatherViewModel: WeatherViewModel by viewModels()
 
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         when {
-            permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
+            permissions.getOrDefault(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                false
+            ) || permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
                 LocationManager.Builder
                     .create(this@MainActivity)
                     .request(onUpdateLocation = { latitude: Double, longitude: Double ->
                         LocationManager.removeCallBack(this@MainActivity)
 
                         locationViewModel.currentLocation.value = LatLng(latitude, longitude)
+
                         weatherViewModel.getLocationByLatLng(locationViewModel.currentLocation.value)
 
                         when (weatherViewModel.state) {
                             STATE.LOADING -> {
                                 Log.d("Fetching LocationID", "Loading")
                             }
+
                             STATE.SUCCESS -> {
                                 weatherViewModel.getCurrentWeather(weatherViewModel.locationId)
                                 weatherViewModel.getDailyWeather(weatherViewModel.locationId)
                                 weatherViewModel.getHourlyWeather(weatherViewModel.locationId)
                                 weatherViewModel.getAir(weatherViewModel.locationId)
                             }
+
                             STATE.FAILED -> {
                                 Log.d("Fetch LocationID Failed", weatherViewModel.errorMessage)
                             }
                         }
-                    })
-            }
 
-            permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                LocationManager.Builder
-                    .create(this@MainActivity)
-                    .request(onUpdateLocation = { latitude: Double, longitude: Double ->
-                        LocationManager.removeCallBack(this@MainActivity)
-
-                        locationViewModel.currentLocation.value = LatLng(latitude, longitude)
-                        weatherViewModel.getLocationByLatLng(locationViewModel.currentLocation.value)
-
-                        when (weatherViewModel.state) {
-                            STATE.LOADING -> {
-                                Log.d("Fetching LocationID", "Loading")
-                            }
-                            STATE.SUCCESS -> {
-                                weatherViewModel.getCurrentWeather(weatherViewModel.locationId)
-                                weatherViewModel.getDailyWeather(weatherViewModel.locationId)
-                                weatherViewModel.getHourlyWeather(weatherViewModel.locationId)
-                                weatherViewModel.getAir(weatherViewModel.locationId)
-                            }
-                            STATE.FAILED -> {
-                                Log.d("Fetch LocationID Failed", weatherViewModel.errorMessage)
-                            }
-                        }
                     })
             }
 
@@ -87,6 +68,10 @@ class MainActivity : ComponentActivity() {
                 LocationManager.goSettingScreen(this)
             }
         }
+    }
+
+    private fun fetchAll() {
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
