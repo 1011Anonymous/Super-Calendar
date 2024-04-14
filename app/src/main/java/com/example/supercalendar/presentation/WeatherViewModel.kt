@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 
 class WeatherViewModel : ViewModel() {
     var state by mutableStateOf(STATE.LOADING)
+
     var errorMessage: String by mutableStateOf("")
 
     var geoResponse: GeoInfo by mutableStateOf(GeoInfo())
@@ -85,7 +86,7 @@ class WeatherViewModel : ViewModel() {
                         locationArrayList[0].id?.let { locationId = it }
                         locationArrayList[0].adm2?.let { locationName = it }
                         onSuccess()
-                        state = STATE.SUCCESS
+
                     } else {
                         onFailure()
                         state = STATE.FAILED
@@ -127,6 +128,7 @@ class WeatherViewModel : ViewModel() {
 
     fun getCurrentWeather(locationId: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            state = STATE.LOADING
             val apiService = WeatherNowClient.getInstance()
 
             try {
@@ -141,14 +143,19 @@ class WeatherViewModel : ViewModel() {
                     now.windSpeed?.let { currentWindSpeed = it }
                     now.humidity?.let { currentHumidity = it }
                 }
+                weatherNowResponse.code?.let {
+                    if (it == "200" || it == "204") state = STATE.SUCCESS
+                }
             } catch (e: Exception) {
                 Log.d("WeatherNow", e.message!!.toString())
+                state = STATE.FAILED
             }
         }
     }
 
     fun getDailyWeather(locationId: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            state = STATE.LOADING
             val apiService = ForecastDailyClient.getInstance()
 
             try {
@@ -171,27 +178,40 @@ class WeatherViewModel : ViewModel() {
                         dailyArrayList[2].windScaleDay?.let { windScale2 = it }
                     }
                 }
+                forecastDailyResponse.code?.let {
+                    if (it == "200" || it == "204") {
+                        state = STATE.SUCCESS
+                    }
+                }
             } catch (e: Exception) {
                 Log.d("ForecastDaily", e.message!!.toString())
+                state = STATE.FAILED
             }
         }
     }
 
     fun getHourlyWeather(locationId: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            state = STATE.LOADING
             val apiService = ForecastHourlyClient.getInstance()
 
             try {
                 forecastHourlyResponse = apiService.getForecastHourly(locationId)
-
+                forecastHourlyResponse.code?.let {
+                    if (it == "200" || it == "204") {
+                        state = STATE.SUCCESS
+                    }
+                }
             } catch (e: Exception) {
                 Log.d("ForecastHourly", e.message!!.toString())
+                state = STATE.FAILED
             }
         }
     }
 
     fun getAir(locationId: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            state = STATE.LOADING
             val apiService = AirRetrofitClient.getInstance()
 
             try {
@@ -201,8 +221,14 @@ class WeatherViewModel : ViewModel() {
                     now.category?.let { category = it }
                     now.pm2p5?.let { pm25 = it }
                 }
+                airResponse.code?.let {
+                    if (it == "200" || it == "204") {
+                        state = STATE.SUCCESS
+                    }
+                }
             } catch (e: Exception) {
                 Log.d("Air", e.message!!.toString())
+                state = STATE.FAILED
             }
         }
     }
