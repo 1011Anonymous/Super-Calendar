@@ -199,18 +199,19 @@ fun WeatherInfoSegment(
             )
 
         }
+
         Row(verticalAlignment = Alignment.CenterVertically) {
 
             Text(
                 text = wind,
-                modifier = Modifier.padding(start = 4.dp, end = 40.dp),
+                modifier = Modifier.padding(start = 4.dp),
                 color = Color.Gray,
                 fontWeight = FontWeight.Bold,
                 fontSize = 10.sp
             )
+            Spacer(modifier = Modifier.width(44.dp))
             Text(
                 text = temperature,
-                modifier = Modifier.padding(end = 16.dp),
                 color = Color.Gray,
                 fontWeight = FontWeight.Bold,
                 fontSize = 10.sp
