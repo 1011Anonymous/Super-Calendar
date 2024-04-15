@@ -43,10 +43,6 @@ class MainActivity : ComponentActivity() {
 
                         weatherViewModel.getLocationByLatLng(
                             latLng = locationViewModel.currentLocation.value,
-                            onSuccess = { fetchAll() },
-                            onFailure = {
-                                Log.d("API Fetch", "Failed to fetch location")
-                            }
                         )
 
 
@@ -57,13 +53,6 @@ class MainActivity : ComponentActivity() {
                 LocationManager.goSettingScreen(this)
             }
         }
-    }
-
-    private fun fetchAll() {
-        weatherViewModel.getCurrentWeather(weatherViewModel.locationId)
-        weatherViewModel.getDailyWeather(weatherViewModel.locationId)
-        weatherViewModel.getHourlyWeather(weatherViewModel.locationId)
-        weatherViewModel.getAir(weatherViewModel.locationId)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

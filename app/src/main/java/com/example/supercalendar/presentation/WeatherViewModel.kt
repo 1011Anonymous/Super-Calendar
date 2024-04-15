@@ -74,7 +74,7 @@ class WeatherViewModel : ViewModel() {
 
 
 
-    fun getLocationByLatLng(latLng: LatLng, onSuccess: () -> Unit, onFailure: () -> Unit) {
+    fun getLocationByLatLng(latLng: LatLng) {
         viewModelScope.launch(Dispatchers.IO) {
             state = STATE.LOADING
             val apiService = GeoRetrofitClient.getInstance()
@@ -89,20 +89,19 @@ class WeatherViewModel : ViewModel() {
                     if (locationArrayList.size > 0) {
                         locationArrayList[0].id?.let { locationId = it }
                         locationArrayList[0].adm2?.let { locationName = it }
-                        onSuccess()
-
+                        updateAll(locationId)
                     } else {
-                        onFailure()
+                        Log.d("API Fetch", "Failed to fetch location")
                         state = STATE.FAILED
                     }
                 } ?: run {
-                    onFailure()
+                    Log.d("API Fetch", "Failed to fetch location")
                     state = STATE.FAILED
                 }
             } catch (e: Exception) {
                 errorMessage = e.message!!.toString()
                 state = STATE.FAILED
-                onFailure()
+                Log.d("API Fetch", "Failed to fetch location")
             }
             Log.d("LocationName", "LocationName: $locationName")
             Log.d("LocationID", "LocationId: $locationId")
@@ -242,7 +241,7 @@ class WeatherViewModel : ViewModel() {
         }
     }
 
-    fun updateAll(locationId: String) {
+    private fun updateAll(locationId: String) {
         getCurrentWeather(locationId)
         getDailyWeather(locationId)
         getHourlyWeather(locationId)

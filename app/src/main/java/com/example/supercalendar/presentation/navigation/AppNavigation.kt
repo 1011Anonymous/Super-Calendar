@@ -62,7 +62,7 @@ fun AppNavigation(
             )
         }
         composable(route = Screen.WeatherScreen.name) {
-            WeatherScreen(weatherViewModel = weatherViewModel)
+            WeatherScreen(weatherViewModel = weatherViewModel, onBack = { navController.popBackStack() })
         }
     }
 }
