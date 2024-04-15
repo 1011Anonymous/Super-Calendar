@@ -145,6 +145,9 @@ fun CalendarView(
                     isToday = today == day.date,
                     isWeekend = day.date.dayOfWeek == DayOfWeek.SATURDAY || day.date.dayOfWeek == DayOfWeek.SUNDAY,
                     isHighlight = homeViewModel.highlightWeekendsState,
+                    isDisplayHoliday = homeViewModel.displayHoliday,
+                    isDisplayFestival = homeViewModel.displayFestival,
+                    isDisplayLunar = homeViewModel.displayLunar,
                     holiday = holidayList.firstOrNull { it.date == day.date.toString() }
                 ) { calendarDay ->
                     selectedDate = if (selectedDate == calendarDay.date) null else calendarDay.date
@@ -192,6 +195,9 @@ fun Day(
     isToday: Boolean,
     isWeekend: Boolean,
     isHighlight: Boolean,
+    isDisplayHoliday: Boolean,
+    isDisplayFestival: Boolean,
+    isDisplayLunar: Boolean,
     holiday: Holiday?,
     onClick: (CalendarDay) -> Unit
 ) {
@@ -252,10 +258,10 @@ fun Day(
                 Text(
                     modifier = Modifier
                         .align(Alignment.BottomCenter),
-                    text = if (it.holiday == convertLocalDateToHoliday1(day.date) || it.holiday == convertLocalDateToHoliday2(
+                    text = if ((it.holiday == convertLocalDateToHoliday1(day.date) || it.holiday == convertLocalDateToHoliday2(
                             day.date
-                        )
-                    ) removeFromName(it.name) else it.lunarday,
+                        )) && isDisplayFestival
+                    ) removeFromName(it.name) else if (isDisplayLunar) it.lunarday else "",
                     color = if (isSelected) Color.White else Color.Black,
                     fontSize = 10.sp
                 )
@@ -271,7 +277,7 @@ fun Day(
                     fontSize = 10.sp
                 )
             }
-            if (day.date.year <= Year.now().value) {
+            if (day.date.year <= Year.now().value && isDisplayHoliday) {
                 if (it.daycode == 1) {
                     Text(
                         modifier = Modifier

@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.example.supercalendar.presentation.HomeViewModel
 import com.example.supercalendar.presentation.WeatherViewModel
 import com.example.supercalendar.presentation.components.ChooseFirstDayDialog
+import com.example.supercalendar.presentation.components.ContentDialog
 import com.example.supercalendar.presentation.components.SearchLocationDialog
 import com.example.supercalendar.ui.theme.bigTitleTextStyle
 import com.example.supercalendar.ui.theme.smallTitleTextStyle
@@ -64,6 +65,10 @@ fun SettingScreen(
     }
 
     var openFirstDayDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var openContentDialog by remember {
         mutableStateOf(false)
     }
 
@@ -136,7 +141,7 @@ fun SettingScreen(
             )
 
             TextButton(
-                onClick = onContent,
+                onClick = { openContentDialog = true },
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RectangleShape,
@@ -358,6 +363,12 @@ fun SettingScreen(
             homeViewModel = homeViewModel,
             open = openFirstDayDialog,
             onClose = { openFirstDayDialog = false }
+        )
+
+        ContentDialog(
+            openDialog = openContentDialog,
+            onClose = { openContentDialog = false },
+            homeViewModel = homeViewModel
         )
     }
 }

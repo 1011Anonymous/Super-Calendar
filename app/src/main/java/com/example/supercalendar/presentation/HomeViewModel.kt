@@ -15,6 +15,10 @@ class HomeViewModel: ViewModel() {
     var highlightWeekendsState by mutableStateOf(false)
     var firstDayOfWeek by mutableStateOf(DayOfWeek.MONDAY)
 
+    var displayHoliday by mutableStateOf(true)
+    var displayLunar by mutableStateOf(true)
+    var displayFestival by mutableStateOf(true)
+
 
     fun setVisibleMonth(yearMonth: YearMonth) {
         visibleMonthState.value = yearMonth
@@ -43,6 +47,18 @@ class HomeViewModel: ViewModel() {
             "周一" -> DayOfWeek.MONDAY
             else -> DayOfWeek.MONDAY
         }
+    }
+
+    fun updateDisplayHoliday() {
+        displayHoliday = !displayHoliday
+    }
+
+    fun updateDisplayFestival() {
+        displayFestival = !displayFestival
+    }
+
+    fun updateDisplayLunar() {
+        displayLunar = !displayLunar
     }
 
 }
