@@ -23,8 +23,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -34,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.supercalendar.presentation.HomeViewModel
+import com.example.supercalendar.presentation.WeatherViewModel
+import com.example.supercalendar.presentation.components.SearchLocationDialog
 import com.example.supercalendar.ui.theme.bigTitleTextStyle
 import com.example.supercalendar.ui.theme.smallTitleTextStyle
 
@@ -41,6 +45,7 @@ import com.example.supercalendar.ui.theme.smallTitleTextStyle
 @Composable
 fun SettingScreen(
     homeViewModel: HomeViewModel = hiltViewModel(),
+    weatherViewModel: WeatherViewModel,
     onBack: () -> Unit,
     onContent: () -> Unit,
     onWeekStart: () -> Unit,
@@ -51,6 +56,10 @@ fun SettingScreen(
     }
 
     val notificationShakeState = remember {
+        mutableStateOf(false)
+    }
+
+    var openDialog by remember {
         mutableStateOf(false)
     }
 
@@ -300,7 +309,7 @@ fun SettingScreen(
             Spacer(modifier = Modifier.size(15.dp))
 
             TextButton(
-                onClick = onWeekStart,
+                onClick = { openDialog = true },
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RectangleShape,
@@ -314,7 +323,7 @@ fun SettingScreen(
                     )
 
                     Text(
-                        text = "绵阳",
+                        text = weatherViewModel.locationName,
                         color = Color.Gray,
                         style = smallTitleTextStyle
                     )
@@ -322,6 +331,12 @@ fun SettingScreen(
             }
             Spacer(modifier = Modifier.size(15.dp))
         }
+
+        SearchLocationDialog(
+            openDialog = openDialog,
+            onClose = { openDialog = false },
+            weatherViewModel = weatherViewModel
+        )
     }
 }
 

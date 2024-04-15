@@ -54,6 +54,7 @@ fun AppNavigation(
             }
         ) {
             SettingScreen(
+                weatherViewModel = weatherViewModel,
                 onBack = { navController.popBackStack() },
                 onContent = {},
                 onWeekStart = {},

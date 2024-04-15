@@ -8,6 +8,8 @@ class HomeViewModel: ViewModel() {
     val visibleMonthState = mutableStateOf(YearMonth.now())
     val isGoBackToday = mutableStateOf(false)
 
+
+
     fun setVisibleMonth(yearMonth: YearMonth) {
         visibleMonthState.value = yearMonth
     }

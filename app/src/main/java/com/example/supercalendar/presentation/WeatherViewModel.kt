@@ -73,6 +73,7 @@ class WeatherViewModel : ViewModel() {
     var pm25 by mutableStateOf(LOADING)
 
 
+
     fun getLocationByLatLng(latLng: LatLng, onSuccess: () -> Unit, onFailure: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             state = STATE.LOADING
@@ -119,6 +120,8 @@ class WeatherViewModel : ViewModel() {
                 geoResponse.location?.let { locationArrayList ->
                     if (locationArrayList.size > 0) {
                         locationArrayList[0].id?.let { locationId = it }
+                        locationArrayList[0].name?.let { locationName = it }
+                        updateAll(locationId)
                     }
                 }
                 state = STATE.SUCCESS
@@ -237,6 +240,13 @@ class WeatherViewModel : ViewModel() {
                 state = STATE.FAILED
             }
         }
+    }
+
+    fun updateAll(locationId: String) {
+        getCurrentWeather(locationId)
+        getDailyWeather(locationId)
+        getHourlyWeather(locationId)
+        getAir(locationId)
     }
 
 }
