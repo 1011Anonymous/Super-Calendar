@@ -33,6 +33,7 @@ import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import com.example.supercalendar.constant.STATE
 import com.example.supercalendar.presentation.WeatherViewModel
+import com.example.supercalendar.presentation.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +54,7 @@ fun WeatherCard(
 
     Card(
         onClick = {
-            /*navController.navigate()*/
+            navController.navigate(Screen.WeatherScreen.name)
         },
         modifier = Modifier
             .size(width = 390.dp, height = 130.dp)

@@ -63,6 +63,9 @@ class WeatherViewModel : ViewModel() {
     var windDir2 by mutableStateOf(LOADING)
     var windScale1 by mutableStateOf(LOADING)
     var windScale2 by mutableStateOf(LOADING)
+    var sunrise0 by mutableStateOf(LOADING)
+    var sunset0 by mutableStateOf(LOADING)
+    var uvIndex0 by mutableStateOf(LOADING)
 
     //Air
     var aqi by mutableStateOf(LOADING)
@@ -164,6 +167,9 @@ class WeatherViewModel : ViewModel() {
                     if (dailyArrayList.size > 3) {
                         dailyArrayList[0].tempMax?.let { tempMax0 = it }
                         dailyArrayList[0].tempMin?.let { tempMin0 = it }
+                        dailyArrayList[0].sunrise?.let { sunrise0 = it }
+                        dailyArrayList[0].sunset?.let { sunset0 = it }
+                        dailyArrayList[0].uvIndex?.let { uvIndex0 = it }
                         dailyArrayList[1].tempMax?.let { tempMax1 = it }
                         dailyArrayList[1].tempMin?.let { tempMin1 = it }
                         dailyArrayList[1].textDay?.let { text1 = it }
