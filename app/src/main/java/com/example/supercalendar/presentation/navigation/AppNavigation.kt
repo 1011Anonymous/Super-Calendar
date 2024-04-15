@@ -35,7 +35,8 @@ fun AppNavigation(
                 navController = navController,
                 locationViewModel = locationViewModel,
                 locationPermissionRequest = locationPermissionRequest,
-                weatherViewModel = weatherViewModel
+                weatherViewModel = weatherViewModel,
+                homeViewModel = homeViewModel
             )
         }
         composable(
@@ -55,6 +56,7 @@ fun AppNavigation(
         ) {
             SettingScreen(
                 weatherViewModel = weatherViewModel,
+                homeViewModel = homeViewModel,
                 onBack = { navController.popBackStack() },
                 onContent = {},
                 onWeekStart = {},

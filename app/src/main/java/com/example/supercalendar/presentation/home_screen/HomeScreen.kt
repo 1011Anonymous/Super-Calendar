@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
@@ -49,7 +51,7 @@ import java.time.YearMonth
 @Composable
 fun HomeScreen(
     weatherViewModel: WeatherViewModel,
-    homeViewModel: HomeViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel,
     locationViewModel: LocationViewModel,
     navController: NavController,
     locationPermissionRequest: ActivityResultLauncher<Array<String>>
@@ -129,6 +131,7 @@ fun HomeScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
         ) {
             CalendarView()
             
@@ -136,7 +139,9 @@ fun HomeScreen(
             
 //            Text(text = String.format("%.2f", locationViewModel.currentLocation.value.longitude))
 //            Text(text = String.format("%.2f", locationViewModel.currentLocation.value.latitude))
-            WeatherCard(navController = navController, weatherViewModel = weatherViewModel)
+            if (!homeViewModel.hideWeather) {
+                WeatherCard(navController = navController, weatherViewModel = weatherViewModel)
+            }
         }
     }
 }

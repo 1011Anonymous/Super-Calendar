@@ -44,7 +44,7 @@ import com.example.supercalendar.ui.theme.smallTitleTextStyle
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingScreen(
-    homeViewModel: HomeViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel,
     weatherViewModel: WeatherViewModel,
     onBack: () -> Unit,
     onContent: () -> Unit,
@@ -294,18 +294,24 @@ fun SettingScreen(
             Spacer(modifier = Modifier.size(8.dp))
 
             TextButton(
-                onClick = onWeekStart,
+                onClick = { homeViewModel.updateHideWeather() },
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RectangleShape,
-                contentPadding = PaddingValues(start = 0.dp, end = 262.dp)
+                //contentPadding = PaddingValues(start = 0.dp, end = 215.dp)
             ) {
                 Text(
-                    text = "单位管理",
+                    text = "是否隐藏",
                     color = Color.Black,
                     style = bigTitleTextStyle
                 )
+                Spacer(modifier = Modifier.width(210.dp))
+                Switch(
+                    checked = homeViewModel.hideWeather,
+                    onCheckedChange = { homeViewModel.hideWeather = it }
+                )
             }
+
             Spacer(modifier = Modifier.size(15.dp))
 
             TextButton(

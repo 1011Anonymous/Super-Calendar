@@ -38,6 +38,8 @@ class WeatherViewModel : ViewModel() {
     var locationName by mutableStateOf(UNKNOWN)
     var locationId by mutableStateOf("")
 
+
+
     //Now
     var currentTemp by mutableStateOf(LOADING)
     var feelsLike by mutableStateOf(LOADING)
