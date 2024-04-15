@@ -34,12 +34,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.supercalendar.presentation.HomeViewModel
 import com.example.supercalendar.presentation.WeatherViewModel
+import com.example.supercalendar.presentation.components.ChooseFirstDayDialog
 import com.example.supercalendar.presentation.components.SearchLocationDialog
 import com.example.supercalendar.ui.theme.bigTitleTextStyle
 import com.example.supercalendar.ui.theme.smallTitleTextStyle
+import java.time.DayOfWeek
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,8 +49,7 @@ fun SettingScreen(
     weatherViewModel: WeatherViewModel,
     onBack: () -> Unit,
     onContent: () -> Unit,
-    onWeekStart: () -> Unit,
-    onHighlightWeekends: () -> Unit,
+    onWeekStart: () -> Unit
 ) {
     val highlightWeekendsState = remember {
         mutableStateOf(false)
@@ -59,9 +59,14 @@ fun SettingScreen(
         mutableStateOf(false)
     }
 
-    var openDialog by remember {
+    var openLocationDialog by remember {
         mutableStateOf(false)
     }
+
+    var openFirstDayDialog by remember {
+        mutableStateOf(false)
+    }
+
 
     Scaffold(
         topBar = {
@@ -95,7 +100,7 @@ fun SettingScreen(
             Spacer(modifier = Modifier.size(8.dp))
 
             TextButton(
-                onClick = onWeekStart,
+                onClick = {},
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RectangleShape,
@@ -146,7 +151,7 @@ fun SettingScreen(
             Spacer(modifier = Modifier.size(10.dp))
 
             TextButton(
-                onClick = onWeekStart,
+                onClick = { openFirstDayDialog = true },
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RectangleShape,
@@ -159,7 +164,12 @@ fun SettingScreen(
                         style = bigTitleTextStyle
                     )
                     Text(
-                        text = "周一",
+                        text = when (homeViewModel.firstDayOfWeek) {
+                            DayOfWeek.MONDAY -> "周一"
+                            DayOfWeek.SATURDAY -> "周六"
+                            DayOfWeek.SUNDAY -> "周日"
+                            else -> "周一"
+                        },
                         color = Color.Gray,
                         style = smallTitleTextStyle
                     )
@@ -200,7 +210,7 @@ fun SettingScreen(
             )
 
             TextButton(
-                onClick = onWeekStart,
+                onClick = {},
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RectangleShape,
@@ -215,7 +225,7 @@ fun SettingScreen(
             Spacer(modifier = Modifier.size(10.dp))
 
             TextButton(
-                onClick = onWeekStart,
+                onClick = { },
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RectangleShape,
@@ -238,7 +248,7 @@ fun SettingScreen(
             Spacer(modifier = Modifier.size(15.dp))
 
             TextButton(
-                onClick = onWeekStart,
+                onClick = { },
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RectangleShape,
@@ -301,7 +311,7 @@ fun SettingScreen(
                 //contentPadding = PaddingValues(start = 0.dp, end = 215.dp)
             ) {
                 Text(
-                    text = "是否隐藏",
+                    text = "隐藏天气",
                     color = Color.Black,
                     style = bigTitleTextStyle
                 )
@@ -315,7 +325,7 @@ fun SettingScreen(
             Spacer(modifier = Modifier.size(15.dp))
 
             TextButton(
-                onClick = { openDialog = true },
+                onClick = { openLocationDialog = true },
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RectangleShape,
@@ -339,9 +349,15 @@ fun SettingScreen(
         }
 
         SearchLocationDialog(
-            openDialog = openDialog,
-            onClose = { openDialog = false },
+            openDialog = openLocationDialog,
+            onClose = { openLocationDialog = false },
             weatherViewModel = weatherViewModel
+        )
+
+        ChooseFirstDayDialog(
+            homeViewModel = homeViewModel,
+            open = openFirstDayDialog,
+            onClose = { openFirstDayDialog = false }
         )
     }
 }

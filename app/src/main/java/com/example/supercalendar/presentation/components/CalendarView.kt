@@ -69,7 +69,7 @@ fun CalendarView(
     val endMonth = remember {
         currentMonth.plusMonths(600)
     }
-    val daysOfWeek = daysOfWeek(firstDayOfWeek = DayOfWeek.MONDAY)
+    val daysOfWeek = daysOfWeek(firstDayOfWeek = homeViewModel.firstDayOfWeek)
     val state = rememberCalendarState(
         startMonth = startMonth,
         endMonth = endMonth,
@@ -106,6 +106,10 @@ fun CalendarView(
                 ).show()
             }
         }
+    }
+
+    LaunchedEffect(key1 = daysOfWeek) {
+        state.firstDayOfWeek = daysOfWeek.first()
     }
 
     Column(

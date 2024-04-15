@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import java.time.DayOfWeek
 import java.time.YearMonth
 
 class HomeViewModel: ViewModel() {
@@ -12,6 +13,7 @@ class HomeViewModel: ViewModel() {
 
     var hideWeather by mutableStateOf(false)
     var highlightWeekendsState by mutableStateOf(false)
+    var firstDayOfWeek by mutableStateOf(DayOfWeek.MONDAY)
 
 
     fun setVisibleMonth(yearMonth: YearMonth) {
@@ -32,6 +34,15 @@ class HomeViewModel: ViewModel() {
 
     fun updateHighlight() {
         highlightWeekendsState = !highlightWeekendsState
+    }
+
+    fun updateFirstDayOfWeek(dayOfWeek: String) {
+        firstDayOfWeek = when(dayOfWeek) {
+            "周六" -> DayOfWeek.SATURDAY
+            "周日" -> DayOfWeek.SUNDAY
+            "周一" -> DayOfWeek.MONDAY
+            else -> DayOfWeek.MONDAY
+        }
     }
 
 }

@@ -15,7 +15,6 @@ import com.example.supercalendar.presentation.WeatherViewModel
 import com.example.supercalendar.presentation.home_screen.HomeScreen
 import com.example.supercalendar.presentation.setting_screen.SettingScreen
 import com.example.supercalendar.presentation.weather_screen.WeatherScreen
-import com.google.android.gms.maps.model.LatLng
 
 @Composable
 fun AppNavigation(
@@ -59,8 +58,7 @@ fun AppNavigation(
                 homeViewModel = homeViewModel,
                 onBack = { navController.popBackStack() },
                 onContent = {},
-                onWeekStart = {},
-                onHighlightWeekends = {}
+                onWeekStart = {}
             )
         }
         composable(route = Screen.WeatherScreen.name) {
