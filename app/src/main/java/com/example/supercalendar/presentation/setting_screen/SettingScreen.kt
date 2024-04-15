@@ -168,7 +168,7 @@ fun SettingScreen(
 
 
             TextButton(
-                onClick = { highlightWeekendsState.value = !highlightWeekendsState.value },
+                onClick = { homeViewModel.updateHighlight() },
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RectangleShape,
@@ -181,8 +181,8 @@ fun SettingScreen(
                 )
                 Spacer(modifier = Modifier.width(210.dp))
                 Switch(
-                    checked = highlightWeekendsState.value,
-                    onCheckedChange = { highlightWeekendsState.value = it }
+                    checked = homeViewModel.highlightWeekendsState,
+                    onCheckedChange = { homeViewModel.highlightWeekendsState = it }
                 )
             }
             Spacer(modifier = Modifier.size(8.dp))

@@ -58,7 +58,7 @@ import java.util.Locale
 @Composable
 fun CalendarView(
     viewModel: HolidayViewModel = hiltViewModel(),
-    homeViewModel: HomeViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel,
 ) {
     val currentMonth = remember {
         YearMonth.now()
@@ -140,6 +140,7 @@ fun CalendarView(
                     isSelected = selectedDate == day.date,
                     isToday = today == day.date,
                     isWeekend = day.date.dayOfWeek == DayOfWeek.SATURDAY || day.date.dayOfWeek == DayOfWeek.SUNDAY,
+                    isHighlight = homeViewModel.highlightWeekendsState,
                     holiday = holidayList.firstOrNull { it.date == day.date.toString() }
                 ) { calendarDay ->
                     selectedDate = if (selectedDate == calendarDay.date) null else calendarDay.date
@@ -186,6 +187,7 @@ fun Day(
     isSelected: Boolean,
     isToday: Boolean,
     isWeekend: Boolean,
+    isHighlight: Boolean,
     holiday: Holiday?,
     onClick: (CalendarDay) -> Unit
 ) {
@@ -230,7 +232,7 @@ fun Day(
                 text = day.date.dayOfMonth.toString(),
                 color = when {
                     isSelected -> Color.White
-                    isWeekend -> MaterialTheme.colorScheme.inversePrimary
+                    isWeekend -> if (isHighlight) MaterialTheme.colorScheme.inversePrimary else Color.Black
                     else -> Color.Black
                 }
             )

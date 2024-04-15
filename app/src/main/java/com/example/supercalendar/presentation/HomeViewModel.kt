@@ -11,6 +11,7 @@ class HomeViewModel: ViewModel() {
     val isGoBackToday = mutableStateOf(false)
 
     var hideWeather by mutableStateOf(false)
+    var highlightWeekendsState by mutableStateOf(false)
 
 
     fun setVisibleMonth(yearMonth: YearMonth) {
@@ -27,6 +28,10 @@ class HomeViewModel: ViewModel() {
 
     fun updateHideWeather() {
         hideWeather = !hideWeather
+    }
+
+    fun updateHighlight() {
+        highlightWeekendsState = !highlightWeekendsState
     }
 
 }

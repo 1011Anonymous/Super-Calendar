@@ -22,29 +22,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.supercalendar.constant.Const.Companion.LOADING
-import com.example.supercalendar.constant.Const.Companion.UNKNOWN
-import com.example.supercalendar.constant.STATE
 import com.example.supercalendar.presentation.HomeViewModel
 import com.example.supercalendar.presentation.LocationViewModel
 import com.example.supercalendar.presentation.WeatherViewModel
 import com.example.supercalendar.presentation.components.CalendarView
 import com.example.supercalendar.presentation.components.WeatherCard
 import com.example.supercalendar.presentation.navigation.Screen
-import com.google.android.gms.maps.model.LatLng
 import java.time.YearMonth
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -133,7 +122,7 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState()),
         ) {
-            CalendarView()
+            CalendarView(homeViewModel = homeViewModel)
             
             Spacer(modifier = Modifier.height(10.dp))
             
