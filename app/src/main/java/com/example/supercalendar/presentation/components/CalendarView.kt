@@ -70,7 +70,10 @@ fun CalendarView(
     val endMonth = remember {
         currentMonth.plusMonths(600)
     }
-    val daysOfWeek = daysOfWeek(firstDayOfWeek = homeViewModel.firstDayOfWeek)
+
+    val firstDayOfWeek by homeViewModel.firstDayOfWeek.collectAsState(initial = DayOfWeek.MONDAY)
+    val daysOfWeek = daysOfWeek(firstDayOfWeek = firstDayOfWeek)
+
     val state = rememberCalendarState(
         startMonth = startMonth,
         endMonth = endMonth,
@@ -87,6 +90,12 @@ fun CalendarView(
     val holidayList by viewModel.holidays.collectAsState()
     val visibleMonthState = remember { mutableStateOf(visibleMonthInScrolling) }
     val context = LocalContext.current
+
+    val selectedIsHoliday by homeViewModel.displayHoliday.collectAsState(initial = false)
+    val selectedIsLunar by homeViewModel.displayLunar.collectAsState(initial = false)
+    val selectedIsFestival by homeViewModel.displayFestival.collectAsState(initial = false)
+    val selectedIsWeekday by homeViewModel.displayWeekday.collectAsState(initial = false)
+    val selectedIsHighlight by homeViewModel.highlightWeekendsState.collectAsState(initial = false)
 
     LaunchedEffect(key1 = Unit) {
         viewModel.loadHolidaysForSurroundingMonths(currentMonth)
@@ -146,11 +155,11 @@ fun CalendarView(
                     isSelected = selectedDate == day.date,
                     isToday = today == day.date,
                     isWeekend = day.date.dayOfWeek == DayOfWeek.SATURDAY || day.date.dayOfWeek == DayOfWeek.SUNDAY,
-                    isHighlight = homeViewModel.highlightWeekendsState,
-                    isDisplayHoliday = homeViewModel.displayHoliday,
-                    isDisplayFestival = homeViewModel.displayFestival,
-                    isDisplayLunar = homeViewModel.displayLunar,
-                    isDisplayDayOfWeek = homeViewModel.displayDayOfWeek,
+                    isHighlight = selectedIsHighlight,
+                    isDisplayHoliday = selectedIsHoliday,
+                    isDisplayFestival = selectedIsFestival,
+                    isDisplayLunar = selectedIsLunar,
+                    isDisplayDayOfWeek = selectedIsWeekday,
                     holiday = holidayList.firstOrNull { it.date == day.date.toString() }
                 ) { calendarDay ->
                     selectedDate = if (selectedDate == calendarDay.date) null else calendarDay.date

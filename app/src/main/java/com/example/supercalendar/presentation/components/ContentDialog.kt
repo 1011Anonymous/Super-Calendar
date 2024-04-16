@@ -10,6 +10,8 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -24,6 +26,17 @@ fun ContentDialog(
     onClose: () -> Unit,
     homeViewModel: HomeViewModel
 ) {
+    val selectedIsHoliday by homeViewModel.displayHoliday.collectAsState(initial = false)
+    var isHoliday = selectedIsHoliday
+
+    val selectedIsLunar by homeViewModel.displayLunar.collectAsState(initial = false)
+    var isLunar = selectedIsLunar
+
+    val selectedIsFestival by homeViewModel.displayFestival.collectAsState(initial = false)
+    var isFestival = selectedIsFestival
+
+    val selectedIsWeekday by homeViewModel.displayWeekday.collectAsState(initial = false)
+    var isWeekday = selectedIsWeekday
 
     if (openDialog) {
         AlertDialog(
@@ -40,7 +53,10 @@ fun ContentDialog(
                         .fillMaxWidth()
                 ) {
                     TextButton(
-                        onClick = { homeViewModel.updateDisplayHoliday() },
+                        onClick = {
+                            isHoliday = !isHoliday
+                            homeViewModel.updateDisplayHoliday(isHoliday)
+                        },
                         modifier = Modifier
                             .fillMaxWidth(),
                         shape = RectangleShape,
@@ -53,13 +69,19 @@ fun ContentDialog(
                         Spacer(modifier = Modifier.width(120.dp))
                         Switch(
                             modifier = Modifier.size(width = 12.dp, height = 8.dp),
-                            checked = homeViewModel.displayHoliday,
-                            onCheckedChange = { homeViewModel.displayHoliday = it }
+                            checked = selectedIsHoliday,
+                            onCheckedChange = {
+                                isHoliday = !isHoliday
+                                homeViewModel.updateDisplayHoliday(isHoliday)
+                            }
                         )
                     }
 
                     TextButton(
-                        onClick = { homeViewModel.updateDisplayFestival() },
+                        onClick = {
+                            isFestival = !isFestival
+                            homeViewModel.updateDisplayFestival(isFestival)
+                        },
                         modifier = Modifier
                             .fillMaxWidth(),
                         shape = RectangleShape,
@@ -72,13 +94,19 @@ fun ContentDialog(
                         Spacer(modifier = Modifier.width(120.dp))
                         Switch(
                             modifier = Modifier.size(width = 12.dp, height = 8.dp),
-                            checked = homeViewModel.displayFestival,
-                            onCheckedChange = { homeViewModel.displayFestival = it }
+                            checked = selectedIsFestival,
+                            onCheckedChange = {
+                                isFestival = !isFestival
+                                homeViewModel.updateDisplayFestival(isFestival)
+                            }
                         )
                     }
 
                     TextButton(
-                        onClick = { homeViewModel.updateDisplayLunar() },
+                        onClick = {
+                            isLunar = !isLunar
+                            homeViewModel.updateDisplayLunar(isLunar)
+                        },
                         modifier = Modifier
                             .fillMaxWidth(),
                         shape = RectangleShape,
@@ -91,13 +119,19 @@ fun ContentDialog(
                         Spacer(modifier = Modifier.width(120.dp))
                         Switch(
                             modifier = Modifier.size(width = 12.dp, height = 8.dp),
-                            checked = homeViewModel.displayLunar,
-                            onCheckedChange = { homeViewModel.displayLunar = it }
+                            checked = selectedIsLunar,
+                            onCheckedChange = {
+                                isLunar = !isLunar
+                                homeViewModel.updateDisplayLunar(isLunar)
+                            }
                         )
                     }
 
                     TextButton(
-                        onClick = { homeViewModel.updateDisplayWeek() },
+                        onClick = {
+                            isWeekday = !isWeekday
+                            homeViewModel.updateDisplayWeek(isWeekday)
+                        },
                         modifier = Modifier
                             .fillMaxWidth(),
                         shape = RectangleShape,
@@ -110,8 +144,11 @@ fun ContentDialog(
                         Spacer(modifier = Modifier.width(120.dp))
                         Switch(
                             modifier = Modifier.size(width = 12.dp, height = 8.dp),
-                            checked = homeViewModel.displayDayOfWeek,
-                            onCheckedChange = { homeViewModel.displayDayOfWeek = it }
+                            checked = selectedIsWeekday,
+                            onCheckedChange = {
+                                isWeekday = !isWeekday
+                                homeViewModel.updateDisplayWeek(isWeekday)
+                            }
                         )
                     }
 

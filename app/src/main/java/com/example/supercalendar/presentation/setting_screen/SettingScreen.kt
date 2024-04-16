@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -72,6 +73,13 @@ fun SettingScreen(
         mutableStateOf(false)
     }
 
+    val selectedFirstDay by homeViewModel.firstDayOfWeek.collectAsState(initial = DayOfWeek.MONDAY)
+
+    val selectedHighlight by homeViewModel.highlightWeekendsState.collectAsState(initial = false)
+    var isHighlight = selectedHighlight
+
+    val selectedHideWeather by homeViewModel.hideWeather.collectAsState(initial = false)
+    var isHide = selectedHideWeather
 
     Scaffold(
         topBar = {
@@ -169,7 +177,7 @@ fun SettingScreen(
                         style = bigTitleTextStyle
                     )
                     Text(
-                        text = when (homeViewModel.firstDayOfWeek) {
+                        text = when (selectedFirstDay) {
                             DayOfWeek.MONDAY -> "周一"
                             DayOfWeek.SATURDAY -> "周六"
                             DayOfWeek.SUNDAY -> "周日"
@@ -183,7 +191,10 @@ fun SettingScreen(
 
 
             TextButton(
-                onClick = { homeViewModel.updateHighlight() },
+                onClick = {
+                    isHighlight = !isHighlight
+                    homeViewModel.updateHighlight(isHighlight)
+                },
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RectangleShape,
@@ -196,8 +207,11 @@ fun SettingScreen(
                 )
                 Spacer(modifier = Modifier.width(210.dp))
                 Switch(
-                    checked = homeViewModel.highlightWeekendsState,
-                    onCheckedChange = { homeViewModel.highlightWeekendsState = it }
+                    checked = selectedHighlight,
+                    onCheckedChange = {
+                        isHighlight = !isHighlight
+                        homeViewModel.updateHighlight(isHighlight)
+                    }
                 )
             }
             Spacer(modifier = Modifier.size(8.dp))
@@ -309,7 +323,10 @@ fun SettingScreen(
             Spacer(modifier = Modifier.size(8.dp))
 
             TextButton(
-                onClick = { homeViewModel.updateHideWeather() },
+                onClick = {
+                    isHide = !isHide
+                    homeViewModel.updateHideWeather(isHide)
+                },
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RectangleShape,
@@ -322,8 +339,11 @@ fun SettingScreen(
                 )
                 Spacer(modifier = Modifier.width(210.dp))
                 Switch(
-                    checked = homeViewModel.hideWeather,
-                    onCheckedChange = { homeViewModel.hideWeather = it }
+                    checked = selectedHideWeather,
+                    onCheckedChange = {
+                        isHide = !isHide
+                        homeViewModel.updateHideWeather(isHide)
+                    }
                 )
             }
 

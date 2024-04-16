@@ -25,6 +25,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -116,6 +118,9 @@ fun HomeScreen(
         },
 
         ) { innerPadding ->
+
+        val selectedHideWeather by homeViewModel.hideWeather.collectAsState(initial = false)
+
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -126,7 +131,7 @@ fun HomeScreen(
             
             Spacer(modifier = Modifier.height(10.dp))
 
-            if (!homeViewModel.hideWeather) {
+            if (!selectedHideWeather) {
                 WeatherCard(navController = navController, weatherViewModel = weatherViewModel)
             }
         }
