@@ -269,10 +269,10 @@ fun Day(
                 Text(
                     modifier = Modifier
                         .align(Alignment.BottomCenter),
-                    text = if (it.holiday == convertLocalDateToHoliday1(day.date) || it.holiday == convertLocalDateToHoliday2(
+                    text = if ((it.holiday == convertLocalDateToHoliday1(day.date) || it.holiday == convertLocalDateToHoliday2(
                             day.date
-                        )
-                    ) removeFromName(it.name) else it.lunarday,
+                        )) && isDisplayFestival
+                    ) removeFromName(it.name) else if (isDisplayLunar) it.lunarday else "",
                     color = Color.Gray,
                     fontSize = 10.sp
                 )
