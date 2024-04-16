@@ -18,6 +18,7 @@ class HomeViewModel: ViewModel() {
     var displayHoliday by mutableStateOf(true)
     var displayLunar by mutableStateOf(true)
     var displayFestival by mutableStateOf(true)
+    var displayDayOfWeek  by mutableStateOf(true)
 
 
     fun setVisibleMonth(yearMonth: YearMonth) {
@@ -59,6 +60,10 @@ class HomeViewModel: ViewModel() {
 
     fun updateDisplayLunar() {
         displayLunar = !displayLunar
+    }
+
+    fun updateDisplayWeek() {
+        displayDayOfWeek = !displayDayOfWeek
     }
 
 }

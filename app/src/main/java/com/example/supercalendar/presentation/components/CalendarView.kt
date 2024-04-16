@@ -35,6 +35,7 @@ import com.example.supercalendar.presentation.HolidayViewModel
 import com.example.supercalendar.presentation.HomeViewModel
 import com.example.supercalendar.utils.convertLocalDateToHoliday1
 import com.example.supercalendar.utils.convertLocalDateToHoliday2
+import com.example.supercalendar.utils.getWeekOfYear
 import com.example.supercalendar.utils.rememberFirstMostVisibleMonth
 import com.example.supercalendar.utils.removeFromName
 import com.kizitonwose.calendar.compose.HorizontalCalendar
@@ -141,6 +142,7 @@ fun CalendarView(
             dayContent = { day ->
                 Day(
                     day,
+                    daysOfWeek,
                     isSelected = selectedDate == day.date,
                     isToday = today == day.date,
                     isWeekend = day.date.dayOfWeek == DayOfWeek.SATURDAY || day.date.dayOfWeek == DayOfWeek.SUNDAY,
@@ -148,6 +150,7 @@ fun CalendarView(
                     isDisplayHoliday = homeViewModel.displayHoliday,
                     isDisplayFestival = homeViewModel.displayFestival,
                     isDisplayLunar = homeViewModel.displayLunar,
+                    isDisplayDayOfWeek = homeViewModel.displayDayOfWeek,
                     holiday = holidayList.firstOrNull { it.date == day.date.toString() }
                 ) { calendarDay ->
                     selectedDate = if (selectedDate == calendarDay.date) null else calendarDay.date
@@ -191,6 +194,7 @@ fun CalendarView(
 @Composable
 fun Day(
     day: CalendarDay,
+    daysOfWeek: List<DayOfWeek>,
     isSelected: Boolean,
     isToday: Boolean,
     isWeekend: Boolean,
@@ -198,6 +202,7 @@ fun Day(
     isDisplayHoliday: Boolean,
     isDisplayFestival: Boolean,
     isDisplayLunar: Boolean,
+    isDisplayDayOfWeek: Boolean,
     holiday: Holiday?,
     onClick: (CalendarDay) -> Unit
 ) {
@@ -296,6 +301,18 @@ fun Day(
                         fontSize = 10.sp
                     )
                 }
+            }
+        }
+
+        if (isDisplayDayOfWeek) {
+            if (day.date.dayOfWeek == daysOfWeek.first()) {
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.TopStart),
+                    color = if (isSelected) Color.White else Color.Gray,
+                    text = "${getWeekOfYear(day.date, daysOfWeek.first())}",
+                    fontSize = 10.sp
+                )
             }
         }
     }

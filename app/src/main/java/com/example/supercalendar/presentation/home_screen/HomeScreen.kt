@@ -125,9 +125,7 @@ fun HomeScreen(
             CalendarView(homeViewModel = homeViewModel)
             
             Spacer(modifier = Modifier.height(10.dp))
-            
-//            Text(text = String.format("%.2f", locationViewModel.currentLocation.value.longitude))
-//            Text(text = String.format("%.2f", locationViewModel.currentLocation.value.latitude))
+
             if (!homeViewModel.hideWeather) {
                 WeatherCard(navController = navController, weatherViewModel = weatherViewModel)
             }

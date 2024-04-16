@@ -9,10 +9,12 @@ import com.kizitonwose.calendar.compose.CalendarLayoutInfo
 import com.kizitonwose.calendar.compose.CalendarState
 import com.kizitonwose.calendar.core.CalendarMonth
 import kotlinx.coroutines.flow.filterNotNull
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.Month
 import java.time.YearMonth
 import java.time.format.TextStyle
+import java.time.temporal.WeekFields
 import java.util.Locale
 
 fun YearMonth.displayText(): String = "${this.month.displayText()} ${this.year}"
@@ -58,4 +60,12 @@ fun removeFromName(name: String): String {
     } else {
         name
     }
+}
+
+fun getWeekOfYear(date: LocalDate, startDayOfWeek: DayOfWeek): Int {
+    val weekFields = WeekFields.of(
+        startDayOfWeek,
+        3
+    )
+    return if (date.get(weekFields.weekOfYear()) == 53) 1 else date.get(weekFields.weekOfYear())
 }

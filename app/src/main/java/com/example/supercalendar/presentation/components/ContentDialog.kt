@@ -100,6 +100,25 @@ fun ContentDialog(
                         )
                     }
 
+                    TextButton(
+                        onClick = { homeViewModel.updateDisplayWeek() },
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        shape = RectangleShape,
+                    ) {
+                        Text(
+                            text = "显示周数",
+                            color = Color.Black,
+                            style = bigTitleTextStyle
+                        )
+                        Spacer(modifier = Modifier.width(120.dp))
+                        Switch(
+                            modifier = Modifier.size(width = 12.dp, height = 8.dp),
+                            checked = homeViewModel.displayDayOfWeek,
+                            onCheckedChange = { homeViewModel.displayDayOfWeek = it }
+                        )
+                    }
+
                 }
             },
             onDismissRequest = { onClose() },
