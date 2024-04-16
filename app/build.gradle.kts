@@ -113,4 +113,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.svg)
 
+    //DataStore
+    implementation(libs.androidx.datastore.preferences)
+
 }

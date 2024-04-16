@@ -3,11 +3,20 @@ package com.example.supercalendar.presentation
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
+import com.example.supercalendar.datastore.StoreUserSettings
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.map
 import java.time.DayOfWeek
 import java.time.YearMonth
+import javax.inject.Inject
 
-class HomeViewModel: ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val userSettings: StoreUserSettings
+): ViewModel() {
+
     val visibleMonthState = mutableStateOf(YearMonth.now())
     val isGoBackToday = mutableStateOf(false)
 
@@ -15,10 +24,16 @@ class HomeViewModel: ViewModel() {
     var highlightWeekendsState by mutableStateOf(false)
     var firstDayOfWeek by mutableStateOf(DayOfWeek.MONDAY)
 
+    private val _displayHoliday = userSettings.settingStatusFlow.map {
+        it.isHoliday
+    }
     var displayHoliday by mutableStateOf(true)
+
     var displayLunar by mutableStateOf(true)
     var displayFestival by mutableStateOf(true)
     var displayDayOfWeek  by mutableStateOf(true)
+
+
 
 
     fun setVisibleMonth(yearMonth: YearMonth) {

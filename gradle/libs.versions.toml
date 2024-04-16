@@ -5,6 +5,7 @@ coilCompose = "2.5.0"
 coilSvg = "2.6.0"
 compose = "2.5.0"
 converterGson = "2.9.0"
+datastorePreferences = "1.0.0"
 hiltAndroid = "2.48.1"
 hiltNavigationCompose = "1.2.0"
 kotlin = "1.9.23"
@@ -27,6 +28,7 @@ roomVersion = "2.6.1"
 [libraries]
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVersion" }
