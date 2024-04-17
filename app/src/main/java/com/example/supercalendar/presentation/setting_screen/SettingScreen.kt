@@ -40,6 +40,7 @@ import com.example.supercalendar.presentation.WeatherViewModel
 import com.example.supercalendar.presentation.components.ChooseFirstDayDialog
 import com.example.supercalendar.presentation.components.ContentDialog
 import com.example.supercalendar.presentation.components.SearchLocationDialog
+import com.example.supercalendar.presentation.components.ThemeDialog
 import com.example.supercalendar.ui.theme.bigTitleTextStyle
 import com.example.supercalendar.ui.theme.smallTitleTextStyle
 import java.time.DayOfWeek
@@ -73,6 +74,10 @@ fun SettingScreen(
         mutableStateOf(false)
     }
 
+    var openThemeDialog by remember {
+        mutableStateOf(false)
+    }
+
     val selectedFirstDay by homeViewModel.firstDayOfWeek.collectAsState(initial = DayOfWeek.MONDAY)
 
     val selectedHighlight by homeViewModel.highlightWeekendsState.collectAsState(initial = false)
@@ -80,6 +85,8 @@ fun SettingScreen(
 
     val selectedHideWeather by homeViewModel.hideWeather.collectAsState(initial = false)
     var isHide = selectedHideWeather
+
+    val theme by homeViewModel.darkTheme.collectAsState(initial = "跟随系统")
 
     Scaffold(
         topBar = {
@@ -113,7 +120,7 @@ fun SettingScreen(
             Spacer(modifier = Modifier.size(8.dp))
 
             TextButton(
-                onClick = {},
+                onClick = { openThemeDialog = true },
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RectangleShape,
@@ -127,7 +134,7 @@ fun SettingScreen(
                     )
 
                     Text(
-                        text = "浅色",
+                        text = theme,
                         color = Color.Gray,
                         style = smallTitleTextStyle
                     )
@@ -390,6 +397,10 @@ fun SettingScreen(
             onClose = { openContentDialog = false },
             homeViewModel = homeViewModel
         )
+
+        ThemeDialog(openDialog = openThemeDialog, homeViewModel = homeViewModel) {
+            openThemeDialog = false
+        }
     }
 }
 

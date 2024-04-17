@@ -18,7 +18,7 @@ import com.example.supercalendar.presentation.weather_screen.WeatherScreen
 
 @Composable
 fun AppNavigation(
-    homeViewModel: HomeViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel,
     locationViewModel: LocationViewModel,
     weatherViewModel: WeatherViewModel,
     locationPermissionRequest: ActivityResultLauncher<Array<String>>

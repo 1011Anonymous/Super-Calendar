@@ -19,7 +19,7 @@ import javax.inject.Singleton
 val Context.myPreferencesDataStore: DataStore<Preferences> by preferencesDataStore("Settings")
 
 data class SettingStatus(
-    //val isDarkTheme: Boolean,
+    val isDarkTheme: String,
     val isHoliday: Boolean,
     val isLunar: Boolean,
     val isFestival: Boolean,
@@ -35,7 +35,7 @@ class StoreUserSettings @Inject constructor(@ApplicationContext context: Context
     private val myPreferencesDataStore = context.myPreferencesDataStore
 
     private object PreferencesKeys {
-        //val IS_DARK_KEY = booleanPreferencesKey("is_dark")
+        val IS_DARK_KEY = stringPreferencesKey("is_dark")
         val IS_HOLIDAY_KEY = booleanPreferencesKey("is_holiday")
         val IS_LUNAR_KEY = booleanPreferencesKey("is_lunar")
         val IS_FESTIVAL_KEY = booleanPreferencesKey("is_festival")
@@ -54,7 +54,7 @@ class StoreUserSettings @Inject constructor(@ApplicationContext context: Context
                 throw exception
             }
         }.map { preferences ->
-            //val isDark = preferences[PreferencesKey.IS_DARK_KEY] ?: false
+            val isDark = preferences[PreferencesKeys.IS_DARK_KEY] ?: "跟随系统"
             val isHighlight = preferences[PreferencesKeys.IS_HIGHLIGHT_KEY] ?: false
             val isHoliday = preferences[PreferencesKeys.IS_HOLIDAY_KEY] ?: false
             val isLunar = preferences[PreferencesKeys.IS_LUNAR_KEY] ?: false
@@ -64,6 +64,7 @@ class StoreUserSettings @Inject constructor(@ApplicationContext context: Context
             val firstDayOfWeek = preferences[PreferencesKeys.FIRST_DAY_OF_WEEK_KEY] ?: "周一"
 
             SettingStatus(
+                isDark,
                 isHoliday,
                 isLunar,
                 isFestival,
@@ -73,6 +74,12 @@ class StoreUserSettings @Inject constructor(@ApplicationContext context: Context
                 isHideWeather
             )
         }
+
+    suspend fun updateIsDark(isDark: String) {
+        myPreferencesDataStore.edit {preferences ->
+            preferences[PreferencesKeys.IS_DARK_KEY] = isDark
+        }
+    }
 
     suspend fun updateIsHoliday(isHoliday: Boolean) {
         myPreferencesDataStore.edit { preferences ->

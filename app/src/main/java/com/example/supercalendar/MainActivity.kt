@@ -6,11 +6,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import com.example.supercalendar.presentation.HomeViewModel
 import com.example.supercalendar.presentation.LocationViewModel
 import com.example.supercalendar.presentation.WeatherViewModel
 import com.example.supercalendar.presentation.navigation.AppNavigation
@@ -24,6 +28,7 @@ class MainActivity : ComponentActivity() {
 
     private val locationViewModel: LocationViewModel by viewModels()
     private val weatherViewModel: WeatherViewModel by viewModels()
+    private val homeViewModel: HomeViewModel by viewModels<HomeViewModel>()
 
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -58,6 +63,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
+            val theme by homeViewModel.darkTheme.collectAsState(initial = "跟随系统")
+            val isDark = when (theme) {
+                "浅色" -> false
+                "深色" -> true
+                else -> isSystemInDarkTheme()
+            }
+
             LaunchedEffect(key1 = Unit) {
                 locationPermissionRequest.launch(
                     arrayOf(
@@ -67,13 +79,16 @@ class MainActivity : ComponentActivity() {
                 )
             }
 
-            SuperCalendarTheme {
+            SuperCalendarTheme(
+                darkTheme = isDark
+            ) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     AppNavigation(
+                        homeViewModel = homeViewModel,
                         locationViewModel = locationViewModel,
                         weatherViewModel = weatherViewModel,
                         locationPermissionRequest = locationPermissionRequest

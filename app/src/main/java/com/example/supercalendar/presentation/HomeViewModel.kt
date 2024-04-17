@@ -21,6 +21,10 @@ class HomeViewModel @Inject constructor(
     val visibleMonthState = mutableStateOf(YearMonth.now())
     val isGoBackToday = mutableStateOf(false)
 
+    val darkTheme = userSettings.settingStatusFlow.map {
+        it.isDarkTheme
+    }
+
     val hideWeather = userSettings.settingStatusFlow.map {
         it.isHideWeather
     }
@@ -72,6 +76,12 @@ class HomeViewModel @Inject constructor(
 
     fun setIsGoBackToday(bool: Boolean) {
         isGoBackToday.value = bool
+    }
+
+    fun updateDarkTheme(isDark: String) {
+        viewModelScope.launch {
+            userSettings.updateIsDark(isDark)
+        }
     }
 
     fun updateHideWeather(display: Boolean) {
