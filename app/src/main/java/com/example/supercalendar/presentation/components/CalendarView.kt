@@ -125,7 +125,7 @@ fun CalendarView(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.onPrimary)
     ) {
         CalendarTitle(
             currentMonth = visibleMonthInScrolling.yearMonth,

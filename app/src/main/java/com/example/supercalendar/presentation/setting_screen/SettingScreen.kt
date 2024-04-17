@@ -129,7 +129,7 @@ fun SettingScreen(
                 Column {
                     Text(
                         text = "主题背景",
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         style = bigTitleTextStyle
                     )
 
@@ -164,7 +164,7 @@ fun SettingScreen(
             ) {
                 Text(
                     text = "日历内容显示",
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = bigTitleTextStyle
                 )
             }
@@ -180,7 +180,7 @@ fun SettingScreen(
                 Column {
                     Text(
                         text = "每周起始日",
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         style = bigTitleTextStyle
                     )
                     Text(
@@ -209,7 +209,7 @@ fun SettingScreen(
             ) {
                 Text(
                     text = "高亮周末",
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = bigTitleTextStyle
                 )
                 Spacer(modifier = Modifier.width(210.dp))
@@ -244,7 +244,7 @@ fun SettingScreen(
             ) {
                 Text(
                     text = "自定义通知",
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = bigTitleTextStyle
                 )
             }
@@ -260,7 +260,7 @@ fun SettingScreen(
                 Column {
                     Text(
                         text = "提醒方式",
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         style = bigTitleTextStyle
                     )
 
@@ -283,7 +283,7 @@ fun SettingScreen(
                 Column {
                     Text(
                         text = "提醒铃声",
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         style = bigTitleTextStyle
                     )
 
@@ -304,7 +304,7 @@ fun SettingScreen(
             ) {
                 Text(
                     text = "提醒震动",
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = bigTitleTextStyle
                 )
                 Spacer(modifier = Modifier.width(210.dp))
@@ -341,7 +341,7 @@ fun SettingScreen(
             ) {
                 Text(
                     text = "隐藏天气",
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = bigTitleTextStyle
                 )
                 Spacer(modifier = Modifier.width(210.dp))
@@ -366,7 +366,7 @@ fun SettingScreen(
                 Column {
                     Text(
                         text = "地理管理",
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         style = bigTitleTextStyle
                     )
 
