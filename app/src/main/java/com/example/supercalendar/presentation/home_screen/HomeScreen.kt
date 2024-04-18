@@ -50,7 +50,6 @@ fun HomeScreen(
     val visibleMonth = homeViewModel.visibleMonthState.value
     val currentMonth = YearMonth.now()
 
-
     Scaffold(
         topBar = {
             TopAppBar(
