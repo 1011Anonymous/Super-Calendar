@@ -95,4 +95,8 @@ class EventViewModel @Inject constructor(
         event = event.copy(endDate = newValue)
     }
 
+    fun updateCategory(newValue: Int) {
+        event = event.copy(category = newValue)
+    }
+
 }

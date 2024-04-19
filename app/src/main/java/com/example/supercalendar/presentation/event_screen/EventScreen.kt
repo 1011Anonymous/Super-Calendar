@@ -131,7 +131,11 @@ fun EventScreen() {
             }
 
             HorizontalPager(state = pagerState) {
-                ScreenOne(pageNumber = it.toString())
+
+                when (it) {
+                    0 -> ReminderScreen()
+                    else -> ScreenOne(pageNumber = it.toString())
+                }
             }
         }
     }

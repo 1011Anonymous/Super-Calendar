@@ -23,6 +23,17 @@ class Const {
             "十一月",
             "十二月"
         )
+
+        val chineseNumerals = mapOf(
+            1 to "周一",
+            2 to "周二",
+            3 to "周三",
+            4 to "周四",
+            5 to "周五",
+            6 to "周六",
+            7 to "周日"
+        )
+
         const val NA = "?"
         const val UNKNOWN = "未知"
         const val LOADING = "_"
