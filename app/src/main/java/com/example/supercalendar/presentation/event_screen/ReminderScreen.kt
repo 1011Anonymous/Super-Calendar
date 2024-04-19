@@ -1,6 +1,7 @@
 package com.example.supercalendar.presentation.event_screen
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -33,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -46,9 +48,12 @@ import com.example.supercalendar.constant.Const.Companion.chineseNumerals
 import com.example.supercalendar.presentation.components.TimePickerDialog
 import com.example.supercalendar.ui.theme.taskTextStyle
 import com.example.supercalendar.utils.DateUtils
+import com.example.supercalendar.utils.convertMillisToLocalTime
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,8 +86,9 @@ fun ReminderScreen() {
                     "${LocalDate.now().dayOfMonth}日" +
                     chineseNumerals[LocalDate.now().dayOfWeek.value])
         }
+        val time = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault()).format(LocalTime.now())
         var timeText by remember {
-            mutableStateOf("${LocalTime.now().hour}:${LocalTime.now().minute}")
+            mutableStateOf(time)
         }
 
 
@@ -119,7 +125,13 @@ fun ReminderScreen() {
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            timeText = "${timePickerState.hour}:${timePickerState.minute}"
+                            val cal = Calendar.getInstance()
+                            cal.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
+                            cal.set(Calendar.MINUTE, timePickerState.minute)
+                            cal.isLenient = false
+                            timeText = DateTimeFormatter
+                                .ofPattern("HH:mm", Locale.getDefault())
+                                .format(convertMillisToLocalTime(cal.timeInMillis))
                             showTimePicker = false
                         }
                     ) { Text("确定") }
@@ -169,12 +181,17 @@ fun ReminderScreen() {
 
         Icon(painter = painterResource(id = R.drawable.outline_access_time_24), contentDescription = null)
 
-        Row {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
             TextButton(onClick = { showDatePicker = true }) {
                 Text(text = dateText)
             }
 
-            Spacer(modifier = Modifier.width(150.dp))
+            Spacer(modifier = Modifier.weight(1f))
 
             TextButton(onClick = { showTimePicker = true }) {
                 Text(text = timeText)
