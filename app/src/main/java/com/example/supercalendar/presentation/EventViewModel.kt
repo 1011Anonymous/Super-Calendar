@@ -9,6 +9,7 @@ import com.example.supercalendar.data.EventRepository
 import com.example.supercalendar.domain.model.event.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,9 +20,11 @@ class EventViewModel @Inject constructor(
     var event by mutableStateOf(
         Event(
             description = "",
+            isAllDay = false,
             isImportant = false,
-            time = "",
-            duration = "",
+            startDate = "",
+            startTime = "",
+            category = 0
         )
     )
         private set
@@ -62,6 +65,8 @@ class EventViewModel @Inject constructor(
         }
     }
 
+    fun getEventsByDate(date: String): Flow<List<Event>> = repository.getEventsByDate(date)
+
     fun updateDescription(newValue: String) {
         event = event.copy(description = newValue)
     }
@@ -70,11 +75,24 @@ class EventViewModel @Inject constructor(
         event = event.copy(isImportant = newValue)
     }
 
-    fun updateTime(newValue: String) {
-        event = event.copy(time = newValue)
+    fun updateIsAllDay(newValue: Boolean) {
+        event = event.copy(isAllDay = newValue)
     }
 
-    fun updateDuration(newValue: String) {
-        event = event.copy(duration = newValue)
+    fun updateStartTime(newValue: String) {
+        event = event.copy(startTime = newValue)
     }
+
+    fun updateEndTime(newValue: String) {
+        event = event.copy(endTime = newValue)
+    }
+
+    fun updateStartDate(newValue: String) {
+        event = event.copy(startDate = newValue)
+    }
+
+    fun updateEndDate(newValue: String) {
+        event = event.copy(endDate = newValue)
+    }
+
 }

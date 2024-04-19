@@ -24,7 +24,14 @@ interface EventDao {
     @Query("SELECT * FROM Event WHERE id = :id")
     suspend fun getEventById(id: Int): Event
 
-    @Query("SELECT * FROM Event")
+    @Query("SELECT * FROM Event ORDER BY startTime ASC")
     fun getAll(): Flow<List<Event>>
+
+    @Query("""
+        SELECT * FROM Event 
+        WHERE :date BETWEEN startDate AND COALESCE(endDate, startDate)
+        ORDER BY startTime ASC
+    """)
+    fun getEventsByDate(date: String): Flow<List<Event>>
 
 }

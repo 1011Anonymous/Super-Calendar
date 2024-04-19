@@ -16,4 +16,6 @@ class EventRepository(
     suspend fun getEventById(id: Int): Event = dao.getEventById(id)
 
     fun getAllEvents(): Flow<List<Event>> = dao.getAll()
+
+    fun getEventsByDate(date: String): Flow<List<Event>> = dao.getEventsByDate(date)
 }
