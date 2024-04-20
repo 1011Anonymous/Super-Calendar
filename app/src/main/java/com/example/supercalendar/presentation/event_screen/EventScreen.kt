@@ -135,6 +135,7 @@ fun EventScreen() {
                 when (it) {
                     0 -> ReminderScreen()
                     1 -> TaskScreen()
+                    2 -> BirthdayScreen()
                     else -> ScreenOne(pageNumber = it.toString())
                 }
             }

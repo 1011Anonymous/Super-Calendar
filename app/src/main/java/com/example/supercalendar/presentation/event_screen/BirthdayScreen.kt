@@ -26,9 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,24 +42,19 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.supercalendar.R
-import com.example.supercalendar.constant.Const.Companion.chineseNumerals
-import com.example.supercalendar.presentation.components.TimePickerDialog
+import com.example.supercalendar.constant.Const
 import com.example.supercalendar.ui.theme.taskTextStyle
 import com.example.supercalendar.utils.DateUtils
-import com.example.supercalendar.utils.convertMillisToLocalTime
 import java.time.LocalDate
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import java.util.Calendar
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReminderScreen() {
+fun BirthdayScreen() {
     Column(
         modifier = Modifier
             .padding(10.dp)
-            .fillMaxSize(),
+            .fillMaxSize()
     ) {
         var text by remember {
             mutableStateOf("")
@@ -75,22 +68,12 @@ fun ReminderScreen() {
             mutableStateOf(false)
         }
 
-        val timePickerState = rememberTimePickerState(is24Hour = true)
-        var showTimePicker by remember {
-            mutableStateOf(false)
-        }
-
         var dateText by remember {
             mutableStateOf("${LocalDate.now().year}年" +
                     "${LocalDate.now().monthValue}月" +
                     "${LocalDate.now().dayOfMonth}日" +
-                    chineseNumerals[LocalDate.now().dayOfWeek.value])
+                    Const.chineseNumerals[LocalDate.now().dayOfWeek.value])
         }
-        val time = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault()).format(LocalTime.now())
-        var timeText by remember {
-            mutableStateOf(time)
-        }
-
 
         if (showDatePicker) {
             DatePickerDialog(
@@ -118,40 +101,10 @@ fun ReminderScreen() {
                 DatePicker(state = datePickerState)
             }
         }
-
-        if (showTimePicker) {
-            TimePickerDialog(
-                onDismissRequest = { showTimePicker = false },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            val cal = Calendar.getInstance()
-                            cal.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
-                            cal.set(Calendar.MINUTE, timePickerState.minute)
-                            cal.isLenient = false
-                            timeText = DateTimeFormatter
-                                .ofPattern("HH:mm", Locale.getDefault())
-                                .format(convertMillisToLocalTime(cal.timeInMillis))
-                            showTimePicker = false
-                        }
-                    ) { Text("确定") }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = {
-                            showTimePicker = false
-                        }
-                    ) { Text("取消") }
-                }
-            ) {
-                TimePicker(state = timePickerState)
-            }
-        }
-
         OutlinedTextField(
             value = text,
             onValueChange = {text = it},
-            placeholder = { Text(text = "请输入提醒") },
+            placeholder = { Text(text = "请输入姓名") },
             shape = RoundedCornerShape(15.dp),
             modifier = Modifier
                 .fillMaxWidth()
@@ -176,7 +129,6 @@ fun ReminderScreen() {
             },
             textStyle = taskTextStyle
         )
-
         Spacer(modifier = Modifier.size(20.dp))
 
         Icon(painter = painterResource(id = R.drawable.outline_access_time_24), contentDescription = null)
@@ -187,14 +139,12 @@ fun ReminderScreen() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            TextButton(onClick = { showDatePicker = true }) {
+            TextButton(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { showDatePicker = true }
+            ) {
                 Text(text = dateText)
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            TextButton(onClick = { showTimePicker = true }) {
-                Text(text = timeText)
+                Spacer(modifier = Modifier.width(250.dp))
             }
         }
         Divider(modifier = Modifier.padding(bottom = 20.dp))
@@ -205,26 +155,17 @@ fun ReminderScreen() {
             modifier = Modifier.fillMaxWidth(),
             onClick = { /*TODO*/ }
         ) {
-            Text(text = "任务发生时")
+            Text(text = "任务发生当天")
             Spacer(modifier = Modifier.width(260.dp))
         }
-        Divider(modifier = Modifier.padding(bottom = 20.dp))
 
-        Icon(imageVector = Icons.Outlined.Refresh, contentDescription = null)
 
-        TextButton(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { /*TODO*/ }
-        ) {
-            Text(text = "不重复")
-            Spacer(modifier = Modifier.width(270.dp))
-        }
 
     }
 }
 
 @Preview
 @Composable
-fun PreviewReminder() {
-    ReminderScreen()
+fun PreviewBirthday() {
+    BirthdayScreen()
 }
