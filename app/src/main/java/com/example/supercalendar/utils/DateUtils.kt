@@ -41,5 +41,11 @@ class DateUtils {
             return dateFormatter.format(dateInMillis)
         }
 
+        fun dateToStringISO(date: LocalDate): String {
+            val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
+            val dateInMillis = convertMillisToLocalDateWithFormatter(date, dateFormatter)
+            return dateFormatter.format(dateInMillis)
+        }
+
     }
 }

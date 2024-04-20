@@ -17,17 +17,23 @@ import javax.inject.Inject
 class EventViewModel @Inject constructor(
     private val repository: EventRepository
 ): ViewModel() {
-    var event by mutableStateOf(
+    var eventForUpdate by mutableStateOf(
         Event(
             description = "",
-            isAllDay = false,
-            isImportant = false,
             startDate = "",
-            startTime = "",
             category = 0
         )
     )
         private set
+
+    var eventForInsert by mutableStateOf(
+        Event(
+            description = "",
+            startDate = "",
+            category = 0
+        )
+    )
+
 
     val getAllEvents = repository.getAllEvents()
     private var deletedEvent: Event? = null
@@ -61,42 +67,46 @@ class EventViewModel @Inject constructor(
 
     fun getEventById(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            event = repository.getEventById(id)
+            eventForUpdate = repository.getEventById(id)
         }
     }
 
     fun getEventsByDate(date: String): Flow<List<Event>> = repository.getEventsByDate(date)
 
     fun updateDescription(newValue: String) {
-        event = event.copy(description = newValue)
-    }
-
-    fun updateIsImportant(newValue: Boolean) {
-        event = event.copy(isImportant = newValue)
+        eventForUpdate = eventForUpdate.copy(description = newValue)
     }
 
     fun updateIsAllDay(newValue: Boolean) {
-        event = event.copy(isAllDay = newValue)
+        eventForUpdate = eventForUpdate.copy(isAllDay = newValue)
     }
 
     fun updateStartTime(newValue: String) {
-        event = event.copy(startTime = newValue)
+        eventForUpdate = eventForUpdate.copy(startTime = newValue)
     }
 
     fun updateEndTime(newValue: String) {
-        event = event.copy(endTime = newValue)
+        eventForUpdate = eventForUpdate.copy(endTime = newValue)
     }
 
     fun updateStartDate(newValue: String) {
-        event = event.copy(startDate = newValue)
+        eventForUpdate = eventForUpdate.copy(startDate = newValue)
     }
 
     fun updateEndDate(newValue: String) {
-        event = event.copy(endDate = newValue)
+        eventForUpdate = eventForUpdate.copy(endDate = newValue)
+    }
+
+    fun updateDeparture(newValue: String) {
+        eventForUpdate = eventForUpdate.copy(departurePlace = newValue)
+    }
+
+    fun updateArrive(newValue: String) {
+        eventForUpdate = eventForUpdate.copy(arrivePlace = newValue)
     }
 
     fun updateCategory(newValue: Int) {
-        event = event.copy(category = newValue)
+        eventForUpdate = eventForUpdate.copy(category = newValue)
     }
 
 }

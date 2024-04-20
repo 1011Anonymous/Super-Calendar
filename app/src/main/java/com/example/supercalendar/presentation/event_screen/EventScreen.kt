@@ -32,17 +32,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.supercalendar.R
+import com.example.supercalendar.domain.model.event.Event
+import com.example.supercalendar.presentation.EventViewModel
+import com.example.supercalendar.presentation.common.toastMsg
 import com.example.supercalendar.ui.theme.topAppBarTextStyle
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun EventScreen(
+    eventViewModel: EventViewModel,
     onBack: () -> Unit
 ) {
+    val context = LocalContext.current
+    var event = eventViewModel.eventForInsert
+
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -58,8 +66,23 @@ fun EventScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(imageVector = Icons.Filled.Check, contentDescription = "Save Event")
+                    IconButton(onClick = {
+                        if (event.description.isNotBlank()) {
+                            eventViewModel.insertEvent(event)
+                            event = Event(
+                                description = "",
+                                startDate = "",
+                                category = 0
+                            )
+                            onBack()
+                        } else {
+                            toastMsg(
+                                context = context,
+                                msg = "请输入相关内容"
+                            )
+                        }
+                    }) {
+                        Icon(imageVector = Icons.Filled.Check, contentDescription = null)
                     }
                 }
             )
@@ -135,10 +158,10 @@ fun EventScreen(
             HorizontalPager(state = pagerState) {
 
                 when (it) {
-                    0 -> ReminderScreen()
-                    1 -> TaskScreen()
-                    2 -> BirthdayScreen()
-                    else -> TravelScreen()
+                    0 -> ReminderScreen(eventViewModel = eventViewModel)
+                    1 -> TaskScreen(eventViewModel = eventViewModel)
+                    2 -> BirthdayScreen(eventViewModel = eventViewModel)
+                    else -> TravelScreen(eventViewModel = eventViewModel)
                 }
             }
         }

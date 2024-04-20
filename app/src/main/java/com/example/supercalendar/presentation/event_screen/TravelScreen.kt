@@ -7,15 +7,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -46,9 +43,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.supercalendar.R
 import com.example.supercalendar.constant.Const
+import com.example.supercalendar.domain.model.event.Event
+import com.example.supercalendar.presentation.EventViewModel
 import com.example.supercalendar.presentation.components.TimePickerDialog
 import com.example.supercalendar.ui.theme.taskTextStyle
 import com.example.supercalendar.utils.DateUtils
@@ -61,7 +59,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TravelScreen() {
+fun TravelScreen(eventViewModel: EventViewModel) {
     Column(
         modifier = Modifier
             .padding(10.dp)
@@ -97,10 +95,23 @@ fun TravelScreen() {
                     "${LocalDate.now().dayOfMonth}日" +
                     Const.chineseNumerals[LocalDate.now().dayOfWeek.value])
         }
+        var dateISO by remember {
+            mutableStateOf(LocalDate.now().toString())
+        }
+
         val time = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault()).format(LocalTime.now())
         var timeText by remember {
             mutableStateOf(time)
         }
+
+        eventViewModel.eventForInsert = Event(
+            description = text,
+            startDate = dateISO,
+            startTime = timeText,
+            departurePlace = departure,
+            arrivePlace = arrive,
+            category = 3
+        )
 
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
@@ -118,6 +129,7 @@ fun TravelScreen() {
                             }
                             val localDate = DateUtils.convertMillisToLocalDate(selectedDate.timeInMillis)
                             dateText = DateUtils.dateToString(localDate)
+                            dateISO = DateUtils.dateToStringISO(localDate)
                             showDatePicker = false
                         }
                     ) { Text("确定") }
@@ -282,8 +294,3 @@ fun TravelScreen() {
     }
 }
 
-@Preview
-@Composable
-fun PreviewTravel() {
-    TravelScreen()
-}

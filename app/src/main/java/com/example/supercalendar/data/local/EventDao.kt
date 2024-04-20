@@ -24,7 +24,10 @@ interface EventDao {
     @Query("SELECT * FROM Event WHERE id = :id")
     suspend fun getEventById(id: Int): Event
 
-    @Query("SELECT * FROM Event ORDER BY startTime ASC")
+    @Query("""
+        SELECT * FROM Event 
+        ORDER BY startDate ASC, startTime ASC
+    """)
     fun getAll(): Flow<List<Event>>
 
     @Query("""

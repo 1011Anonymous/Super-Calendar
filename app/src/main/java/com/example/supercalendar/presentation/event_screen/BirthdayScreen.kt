@@ -45,6 +45,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.supercalendar.R
 import com.example.supercalendar.constant.Const
+import com.example.supercalendar.domain.model.event.Event
+import com.example.supercalendar.presentation.EventViewModel
 import com.example.supercalendar.ui.theme.taskTextStyle
 import com.example.supercalendar.utils.DateUtils
 import java.time.LocalDate
@@ -52,7 +54,9 @@ import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BirthdayScreen() {
+fun BirthdayScreen(
+    eventViewModel: EventViewModel
+) {
     Column(
         modifier = Modifier
             .padding(10.dp)
@@ -77,6 +81,15 @@ fun BirthdayScreen() {
                     "${LocalDate.now().dayOfMonth}日" +
                     Const.chineseNumerals[LocalDate.now().dayOfWeek.value])
         }
+        var dateISO by remember {
+            mutableStateOf(LocalDate.now().toString())
+        }
+
+        eventViewModel.eventForInsert = Event(
+            description = text,
+            startDate = dateISO,
+            category = 2
+        )
 
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
@@ -93,6 +106,7 @@ fun BirthdayScreen() {
                             }
                             val localDate = DateUtils.convertMillisToLocalDate(selectedDate.timeInMillis)
                             dateText = DateUtils.dateToString(localDate)
+                            dateISO = DateUtils.dateToStringISO(localDate)
                             showDatePicker = false
                         }
                     ) { Text("确定") }
@@ -169,10 +183,4 @@ fun BirthdayScreen() {
 
 
     }
-}
-
-@Preview
-@Composable
-fun PreviewBirthday() {
-    BirthdayScreen()
 }

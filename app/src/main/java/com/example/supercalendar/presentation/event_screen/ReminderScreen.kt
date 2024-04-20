@@ -39,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
@@ -47,6 +48,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.supercalendar.R
 import com.example.supercalendar.constant.Const.Companion.chineseNumerals
+import com.example.supercalendar.domain.model.event.Event
+import com.example.supercalendar.presentation.EventViewModel
 import com.example.supercalendar.presentation.components.TimePickerDialog
 import com.example.supercalendar.ui.theme.taskTextStyle
 import com.example.supercalendar.utils.DateUtils
@@ -59,7 +62,9 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReminderScreen() {
+fun ReminderScreen(
+    eventViewModel: EventViewModel
+) {
     Column(
         modifier = Modifier
             .padding(10.dp)
@@ -91,10 +96,21 @@ fun ReminderScreen() {
                         chineseNumerals[LocalDate.now().dayOfWeek.value]
             )
         }
+        var dateISO by remember {
+            mutableStateOf(LocalDate.now().toString())
+        }
+
         val time = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault()).format(LocalTime.now())
         var timeText by remember {
             mutableStateOf(time)
         }
+
+        eventViewModel.eventForInsert = Event(
+            description = text,
+            startDate = dateISO,
+            startTime = timeText,
+            category = 0
+        )
 
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
@@ -113,6 +129,7 @@ fun ReminderScreen() {
                             val localDate =
                                 DateUtils.convertMillisToLocalDate(selectedDate.timeInMillis)
                             dateText = DateUtils.dateToString(localDate)
+                            dateISO = DateUtils.dateToStringISO(localDate)
                             showDatePicker = false
                         }
                     ) { Text("确定") }
@@ -239,8 +256,3 @@ fun ReminderScreen() {
     }
 }
 
-@Preview
-@Composable
-fun PreviewReminder() {
-    ReminderScreen()
-}

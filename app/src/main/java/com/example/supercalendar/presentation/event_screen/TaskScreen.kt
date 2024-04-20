@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -49,6 +50,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.supercalendar.R
 import com.example.supercalendar.constant.Const
+import com.example.supercalendar.domain.model.event.Event
+import com.example.supercalendar.presentation.EventViewModel
 import com.example.supercalendar.presentation.components.TimePickerDialog
 import com.example.supercalendar.ui.theme.taskTextStyle
 import com.example.supercalendar.utils.DateUtils
@@ -62,7 +65,9 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskScreen() {
+fun TaskScreen(
+    eventViewModel: EventViewModel
+) {
 
     Column(
         modifier = Modifier
@@ -106,6 +111,10 @@ fun TaskScreen() {
                         Const.chineseNumerals[LocalDate.now().dayOfWeek.value]
             )
         }
+        var startDateISO by remember {
+            mutableStateOf(LocalDate.now().toString())
+        }
+
         var endDateText by remember {
             mutableStateOf(
                 "${LocalDate.now().year}年" +
@@ -113,6 +122,9 @@ fun TaskScreen() {
                         "${LocalDate.now().dayOfMonth}日" +
                         Const.chineseNumerals[LocalDate.now().dayOfWeek.value]
             )
+        }
+        var endDateISO by remember {
+            mutableStateOf(LocalDate.now().toString())
         }
 
 
@@ -124,6 +136,16 @@ fun TaskScreen() {
         var endTimeText by remember {
             mutableStateOf(endTime)
         }
+
+        eventViewModel.eventForInsert = Event(
+            description = text,
+            isAllDay = isChecked,
+            startDate = startDateISO,
+            endDate = endDateISO,
+            startTime = startTimeText,
+            endTime = endTimeText,
+            category = 1
+        )
 
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
@@ -142,6 +164,7 @@ fun TaskScreen() {
                             val localDate =
                                 DateUtils.convertMillisToLocalDate(selectedDate.timeInMillis)
                             startDateText = DateUtils.dateToString(localDate)
+                            startDateISO = DateUtils.dateToStringISO(localDate)
                             showStartDatePicker = false
                         }
                     ) { Text("确定") }
@@ -170,6 +193,7 @@ fun TaskScreen() {
                             val localDate =
                                 DateUtils.convertMillisToLocalDate(selectedDate.timeInMillis)
                             endDateText = DateUtils.dateToString(localDate)
+                            endDateISO = DateUtils.dateToStringISO(localDate)
                             showEndDatePicker = false
                         }
                     ) { Text("确定") }
@@ -357,12 +381,8 @@ fun TaskScreen() {
             Text(text = "不重复")
             Spacer(modifier = Modifier.width(270.dp))
         }
+
     }
 
 }
 
-@Preview
-@Composable
-fun PreviewTask() {
-    TaskScreen()
-}

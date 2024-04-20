@@ -14,6 +14,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import com.example.supercalendar.presentation.EventViewModel
 import com.example.supercalendar.presentation.HomeViewModel
 import com.example.supercalendar.presentation.LocationViewModel
 import com.example.supercalendar.presentation.WeatherViewModel
@@ -29,6 +30,7 @@ class MainActivity : ComponentActivity() {
     private val locationViewModel: LocationViewModel by viewModels()
     private val weatherViewModel: WeatherViewModel by viewModels()
     private val homeViewModel: HomeViewModel by viewModels<HomeViewModel>()
+    private val eventViewModel: EventViewModel by viewModels<EventViewModel>()
 
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -88,6 +90,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     AppNavigation(
+                        eventViewModel = eventViewModel,
                         homeViewModel = homeViewModel,
                         locationViewModel = locationViewModel,
                         weatherViewModel = weatherViewModel,

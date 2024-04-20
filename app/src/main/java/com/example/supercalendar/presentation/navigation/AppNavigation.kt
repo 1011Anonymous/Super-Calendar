@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.supercalendar.presentation.EventViewModel
 import com.example.supercalendar.presentation.HomeViewModel
 import com.example.supercalendar.presentation.LocationViewModel
 import com.example.supercalendar.presentation.WeatherViewModel
@@ -20,6 +21,7 @@ import com.example.supercalendar.presentation.weather_screen.WeatherScreen
 
 @Composable
 fun AppNavigation(
+    eventViewModel: EventViewModel,
     homeViewModel: HomeViewModel,
     locationViewModel: LocationViewModel,
     weatherViewModel: WeatherViewModel,
@@ -86,7 +88,10 @@ fun AppNavigation(
                 )
             }
         ) {
-            EventScreen(onBack = { navController.popBackStack() })
+            EventScreen(
+                eventViewModel = eventViewModel,
+                onBack = { navController.popBackStack() }
+            )
         }
     }
 }
