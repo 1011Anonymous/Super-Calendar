@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -44,8 +45,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.supercalendar.R
-import com.example.supercalendar.constant.Const.Companion.chineseNumerals
+import com.example.supercalendar.constant.Const
 import com.example.supercalendar.presentation.components.TimePickerDialog
 import com.example.supercalendar.ui.theme.taskTextStyle
 import com.example.supercalendar.utils.DateUtils
@@ -58,13 +60,19 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReminderScreen() {
+fun TravelScreen() {
     Column(
         modifier = Modifier
             .padding(10.dp)
             .fillMaxSize(),
     ) {
         var text by remember {
+            mutableStateOf("")
+        }
+        var departure by remember {
+            mutableStateOf("")
+        }
+        var arrive by remember {
             mutableStateOf("")
         }
         val focusRequester = remember {
@@ -83,12 +91,10 @@ fun ReminderScreen() {
         }
 
         var dateText by remember {
-            mutableStateOf(
-                "${LocalDate.now().year}年" +
-                        "${LocalDate.now().monthValue}月" +
-                        "${LocalDate.now().dayOfMonth}日" +
-                        chineseNumerals[LocalDate.now().dayOfWeek.value]
-            )
+            mutableStateOf("${LocalDate.now().year}年" +
+                    "${LocalDate.now().monthValue}月" +
+                    "${LocalDate.now().dayOfMonth}日" +
+                    Const.chineseNumerals[LocalDate.now().dayOfWeek.value])
         }
         val time = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault()).format(LocalTime.now())
         var timeText by remember {
@@ -105,8 +111,7 @@ fun ReminderScreen() {
                             val selectedDate = Calendar.getInstance().apply {
                                 this.timeInMillis = datePickerState.selectedDateMillis!!
                             }
-                            val localDate =
-                                DateUtils.convertMillisToLocalDate(selectedDate.timeInMillis)
+                            val localDate = DateUtils.convertMillisToLocalDate(selectedDate.timeInMillis)
                             dateText = DateUtils.dateToString(localDate)
                             showDatePicker = false
                         }
@@ -155,8 +160,8 @@ fun ReminderScreen() {
 
         OutlinedTextField(
             value = text,
-            onValueChange = { text = it },
-            placeholder = { Text(text = "请输入提醒") },
+            onValueChange = {text = it},
+            placeholder = { Text(text = "请输入航班号或车次号，如CZ8888") },
             shape = RoundedCornerShape(15.dp),
             modifier = Modifier
                 .fillMaxWidth()
@@ -184,10 +189,7 @@ fun ReminderScreen() {
 
         Spacer(modifier = Modifier.size(20.dp))
 
-        Icon(
-            painter = painterResource(id = R.drawable.outline_access_time_24),
-            contentDescription = null
-        )
+        Icon(painter = painterResource(id = R.drawable.outline_access_time_24), contentDescription = null)
 
         Row(
             modifier = Modifier
@@ -207,35 +209,76 @@ fun ReminderScreen() {
         }
         Divider(modifier = Modifier.padding(bottom = 20.dp))
 
-        Icon(
-            painter = painterResource(id = R.drawable.outline_notifications_active_24),
-            contentDescription = null
-        )
+        Icon(painter = painterResource(id = R.drawable.outline_location_on_24), contentDescription = null)
 
-        TextButton(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { /*TODO*/ }
-        ) {
-            Text(text = "任务发生时")
-            Spacer(modifier = Modifier.width(260.dp))
-        }
+        OutlinedTextField(
+            value = departure,
+            onValueChange = {departure = it},
+            placeholder = { Text(text = "请输入出发地点")},
+            shape = RoundedCornerShape(15.dp),
+            modifier = Modifier
+                .padding(vertical = 10.dp)
+                .fillMaxWidth()
+                .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(15.dp))
+                .focusRequester(focusRequester),
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    focusManager.clearFocus()
+                }
+            ),
+            trailingIcon = {
+                IconButton(onClick = { departure = "" }) {
+                    Icon(
+                        imageVector = Icons.Rounded.Clear,
+                        contentDescription = null
+                    )
+                }
+            },
+            textStyle = taskTextStyle
+        )
         Divider(modifier = Modifier.padding(bottom = 20.dp))
 
-        Icon(imageVector = Icons.Outlined.Refresh, contentDescription = null)
+        Icon(painter = painterResource(id = R.drawable.outline_location_on_24), contentDescription = null)
 
-        TextButton(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { /*TODO*/ }
-        ) {
-            Text(text = "不重复")
-            Spacer(modifier = Modifier.width(270.dp))
-        }
+        OutlinedTextField(
+            value = arrive,
+            onValueChange = {arrive = it},
+            placeholder = { Text(text = "请输入到达地点")},
+            shape = RoundedCornerShape(15.dp),
+            modifier = Modifier
+                .padding(vertical = 10.dp)
+                .fillMaxWidth()
+                .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(15.dp))
+                .focusRequester(focusRequester),
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    focusManager.clearFocus()
+                }
+            ),
+            trailingIcon = {
+                IconButton(onClick = { arrive = "" }) {
+                    Icon(
+                        imageVector = Icons.Rounded.Clear,
+                        contentDescription = null
+                    )
+                }
+            },
+            textStyle = taskTextStyle
+        )
 
     }
 }
 
 @Preview
 @Composable
-fun PreviewReminder() {
-    ReminderScreen()
+fun PreviewTravel() {
+    TravelScreen()
 }

@@ -39,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -73,6 +74,7 @@ fun TaskScreen() {
         val focusRequester = remember {
             FocusRequester()
         }
+        val focusManager = LocalFocusManager.current
 
         val formatter = remember { SimpleDateFormat("hh:mm a", Locale.getDefault()) }
 
@@ -252,7 +254,7 @@ fun TaskScreen() {
             ),
             keyboardActions = KeyboardActions(
                 onDone = {
-
+                    focusManager.clearFocus()
                 }
             ),
             trailingIcon = {
