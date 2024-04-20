@@ -216,13 +216,17 @@ fun TaskScreen(
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            val cal = Calendar.getInstance()
-                            cal.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
-                            cal.set(Calendar.MINUTE, timePickerState.minute)
-                            cal.isLenient = false
-                            startTimeText =  DateTimeFormatter
-                                .ofPattern("HH:mm", Locale.getDefault())
-                                .format(convertMillisToLocalTime(cal.timeInMillis))
+                            if (isChecked) {
+                                startTimeText = "全天"
+                            } else {
+                                val cal = Calendar.getInstance()
+                                cal.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
+                                cal.set(Calendar.MINUTE, timePickerState.minute)
+                                cal.isLenient = false
+                                startTimeText = DateTimeFormatter
+                                    .ofPattern("HH:mm", Locale.getDefault())
+                                    .format(convertMillisToLocalTime(cal.timeInMillis))
+                            }
                             showStartTimePicker = false
                         }
                     ) { Text("确定") }
@@ -245,13 +249,17 @@ fun TaskScreen(
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            val cal = Calendar.getInstance()
-                            cal.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
-                            cal.set(Calendar.MINUTE, timePickerState.minute)
-                            cal.isLenient = false
-                            endTimeText = DateTimeFormatter
-                                .ofPattern("HH:mm", Locale.getDefault())
-                                .format(convertMillisToLocalTime(cal.timeInMillis))
+                            if (isChecked) {
+                                endTimeText = "全天"
+                            } else {
+                                val cal = Calendar.getInstance()
+                                cal.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
+                                cal.set(Calendar.MINUTE, timePickerState.minute)
+                                cal.isLenient = false
+                                endTimeText = DateTimeFormatter
+                                    .ofPattern("HH:mm", Locale.getDefault())
+                                    .format(convertMillisToLocalTime(cal.timeInMillis))
+                            }
                             showEndTimePicker = false
                         }
                     ) { Text("确定") }

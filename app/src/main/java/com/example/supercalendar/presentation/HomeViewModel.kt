@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.YearMonth
 import javax.inject.Inject
 
@@ -64,6 +65,8 @@ class HomeViewModel @Inject constructor(
         it.isWeekday
     }
     //var displayWeekday  by mutableStateOf(true)
+
+    var selectedDate by mutableStateOf(LocalDate.now().toString())
 
 
     fun setVisibleMonth(yearMonth: YearMonth) {

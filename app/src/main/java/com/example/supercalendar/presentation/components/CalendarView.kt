@@ -10,7 +10,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.supercalendar.domain.model.holiday.Holiday
+import com.example.supercalendar.presentation.EventViewModel
 import com.example.supercalendar.presentation.HolidayViewModel
 import com.example.supercalendar.presentation.HomeViewModel
 import com.example.supercalendar.utils.convertLocalDateToHoliday1
@@ -60,6 +66,7 @@ import java.util.Locale
 fun CalendarView(
     viewModel: HolidayViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel,
+    eventViewModel: EventViewModel
 ) {
     val currentMonth = remember {
         YearMonth.now()
@@ -160,9 +167,11 @@ fun CalendarView(
                     isDisplayFestival = selectedIsFestival,
                     isDisplayLunar = selectedIsLunar,
                     isDisplayDayOfWeek = selectedIsWeekday,
-                    holiday = holidayList.firstOrNull { it.date == day.date.toString() }
+                    holiday = holidayList.firstOrNull { it.date == day.date.toString() },
+                    eventViewModel = eventViewModel
                 ) { calendarDay ->
                     selectedDate = if (selectedDate == calendarDay.date) null else calendarDay.date
+                    homeViewModel.selectedDate = selectedDate.toString()
                 }
             },
             monthHeader = {
@@ -213,8 +222,13 @@ fun Day(
     isDisplayLunar: Boolean,
     isDisplayDayOfWeek: Boolean,
     holiday: Holiday?,
+    eventViewModel: EventViewModel,
     onClick: (CalendarDay) -> Unit
 ) {
+    val events by
+    eventViewModel.getEventsByDate(day.date.toString()).collectAsState(initial = emptyList())
+
+
     Box(
         modifier = Modifier
             .then(
@@ -323,6 +337,15 @@ fun Day(
                     fontSize = 10.sp
                 )
             }
+        }
+
+        if (events.isNotEmpty() && !isSelected) {
+            Icon(
+                modifier = Modifier
+                    .align(Alignment.TopCenter),
+                imageVector = Icons.Filled.ArrowDropDown,
+                contentDescription = null
+            )
         }
     }
 }

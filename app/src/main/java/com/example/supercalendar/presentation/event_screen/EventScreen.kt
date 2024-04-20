@@ -168,16 +168,6 @@ fun EventScreen(
     }
 }
 
-@Composable
-fun ScreenOne(pageNumber: String) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Text(text = pageNumber)
-    }
-}
 
 
 

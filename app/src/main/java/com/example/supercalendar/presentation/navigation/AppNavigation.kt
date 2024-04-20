@@ -39,7 +39,9 @@ fun AppNavigation(
                 locationViewModel = locationViewModel,
                 locationPermissionRequest = locationPermissionRequest,
                 weatherViewModel = weatherViewModel,
-                homeViewModel = homeViewModel
+                homeViewModel = homeViewModel,
+                eventViewModel = eventViewModel,
+                onUpdate = {  }
             )
         }
 
