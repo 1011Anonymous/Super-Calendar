@@ -31,6 +31,7 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -122,6 +123,10 @@ fun TaskScreen() {
         }
         var endTimeText by remember {
             mutableStateOf(endTime)
+        }
+
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
         }
 
 

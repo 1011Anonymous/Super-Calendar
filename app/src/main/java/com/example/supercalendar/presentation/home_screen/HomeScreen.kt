@@ -109,7 +109,7 @@ fun HomeScreen(
             FloatingActionButton(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.primary,
-                onClick = { /*TODO*/ }
+                onClick = { navController.navigate(Screen.EventScreen.name) }
             ) {
                 Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Events")
             }

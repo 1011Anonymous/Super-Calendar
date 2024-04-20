@@ -30,6 +30,7 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -93,6 +94,10 @@ fun ReminderScreen() {
         val time = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault()).format(LocalTime.now())
         var timeText by remember {
             mutableStateOf(time)
+        }
+
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
         }
 
 

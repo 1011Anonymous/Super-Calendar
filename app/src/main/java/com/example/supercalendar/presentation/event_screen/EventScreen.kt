@@ -40,7 +40,9 @@ import com.example.supercalendar.ui.theme.topAppBarTextStyle
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun EventScreen() {
+fun EventScreen(
+    onBack: () -> Unit
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -51,7 +53,7 @@ fun EventScreen() {
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { onBack() }) {
                         Icon(imageVector = Icons.Filled.Close, contentDescription = "Back to Home")
                     }
                 },
@@ -156,8 +158,3 @@ fun ScreenOne(pageNumber: String) {
 
 
 
-@Preview
-@Composable
-fun PreviewPager() {
-    EventScreen()
-}

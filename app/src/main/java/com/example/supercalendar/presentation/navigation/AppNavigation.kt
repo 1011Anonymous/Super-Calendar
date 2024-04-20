@@ -3,15 +3,17 @@ package com.example.supercalendar.presentation.navigation
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.supercalendar.presentation.HomeViewModel
 import com.example.supercalendar.presentation.LocationViewModel
 import com.example.supercalendar.presentation.WeatherViewModel
+import com.example.supercalendar.presentation.event_screen.EventScreen
 import com.example.supercalendar.presentation.home_screen.HomeScreen
 import com.example.supercalendar.presentation.setting_screen.SettingScreen
 import com.example.supercalendar.presentation.weather_screen.WeatherScreen
@@ -38,6 +40,7 @@ fun AppNavigation(
                 homeViewModel = homeViewModel
             )
         }
+
         composable(
             route = Screen.SettingScreen.name,
             enterTransition = {
@@ -61,8 +64,29 @@ fun AppNavigation(
                 onWeekStart = {}
             )
         }
+
         composable(route = Screen.WeatherScreen.name) {
-            WeatherScreen(weatherViewModel = weatherViewModel, onBack = { navController.popBackStack() })
+            WeatherScreen(
+                weatherViewModel = weatherViewModel,
+                onBack = { navController.popBackStack() })
+        }
+
+        composable(
+            route = Screen.EventScreen.name,
+            enterTransition = {
+                slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { it },
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            EventScreen(onBack = { navController.popBackStack() })
         }
     }
 }
