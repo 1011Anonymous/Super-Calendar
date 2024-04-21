@@ -1,6 +1,7 @@
 package com.example.supercalendar.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -128,7 +129,8 @@ fun WeatherCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(color = MaterialTheme.colorScheme.primaryContainer)
+                    .background(color = MaterialTheme.colorScheme.primaryContainer),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 WeatherInfoSegment(
                     day = "明天",
@@ -137,13 +139,21 @@ fun WeatherCard(
                     temperature = "${weatherViewModel.tempMin1}°/${weatherViewModel.tempMax1}°",
                     iconID = weatherViewModel.icon1
                 )
+
                 Divider(
                     color = Color.White,
                     modifier = Modifier
                         .fillMaxHeight()
                         .width(1.dp)
-                        .padding(vertical = 4.dp)
+                        .align(Alignment.CenterVertically)
                 )
+
+                /*
+                Spacer(modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+                )
+                */
                 WeatherInfoSegment(
                     day = "后天",
                     weatherCondition = weatherViewModel.text2,

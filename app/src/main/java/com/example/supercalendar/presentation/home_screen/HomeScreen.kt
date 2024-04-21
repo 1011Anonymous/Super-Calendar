@@ -3,10 +3,8 @@ package com.example.supercalendar.presentation.home_screen
 import android.Manifest
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBar
@@ -135,13 +134,20 @@ fun HomeScreen(
 
         val selectedHideWeather by homeViewModel.hideWeather.collectAsState(initial = false)
 
+        val events by
+        eventViewModel.getEventsByDate(homeViewModel.selectedDate).collectAsState(
+            initial = emptyList()
+        )
+
+        /*
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxWidth()
+            //.verticalScroll(rememberScrollState())
         ) {
             CalendarView(homeViewModel = homeViewModel, eventViewModel = eventViewModel)
-            
+
             Spacer(modifier = Modifier.height(10.dp))
 
             if (!selectedHideWeather) {
@@ -163,7 +169,7 @@ fun HomeScreen(
                     items(
                         items = events,
                         key = { item -> item.id }
-                    ) {event ->
+                    ) { event ->
                         EventCard(
                             event = event,
                             onDone = {
@@ -182,6 +188,54 @@ fun HomeScreen(
                 }
             }
 
+        }
+        */
+
+        LazyColumn(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxWidth(),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            item {
+                CalendarView(homeViewModel = homeViewModel, eventViewModel = eventViewModel)
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+
+            if (!selectedHideWeather) {
+                item {
+                    WeatherCard(
+                        navController = navController,
+                        weatherViewModel = weatherViewModel
+                    )
+                }
+            }
+
+            if (events.isNotEmpty()) {
+                items(
+                    items = events,
+                    key = { item -> item.id }
+                ) { event ->
+                    EventCard(
+                        event = event,
+                        onDone = {
+                            eventViewModel.deleteEvent(event)
+                            mySnackBar(
+                                scope = scope,
+                                snackbarHostState = snackbarHostState,
+                                message = "撤销删除! -> \"${event.description}\"",
+                                actionLabel = "UNDO",
+                                onAction = { eventViewModel.undoDeleteEvent() }
+                            )
+                        },
+                        onUpdate = onUpdate
+                    )
+                }
+            }
         }
     }
 }

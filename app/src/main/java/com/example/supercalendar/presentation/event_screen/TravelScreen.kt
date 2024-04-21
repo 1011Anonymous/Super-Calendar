@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -226,6 +227,20 @@ fun TravelScreen(eventViewModel: EventViewModel) {
         }
         Divider(modifier = Modifier.padding(bottom = 20.dp))
 
+        Icon(
+            painter = painterResource(id = R.drawable.outline_notifications_active_24),
+            contentDescription = null
+        )
+
+        TextButton(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { /*TODO*/ }
+        ) {
+            Text(text = "任务发生时")
+            Spacer(modifier = Modifier.width(260.dp))
+        }
+        Divider(modifier = Modifier.padding(bottom = 20.dp))
+
         Icon(painter = painterResource(id = R.drawable.outline_location_on_24), contentDescription = null)
 
         OutlinedTextField(
@@ -236,8 +251,7 @@ fun TravelScreen(eventViewModel: EventViewModel) {
             modifier = Modifier
                 .padding(vertical = 10.dp)
                 .fillMaxWidth()
-                .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(15.dp))
-                .focusRequester(focusRequester),
+                .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(15.dp)),
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences,
                 imeAction = ImeAction.Done
@@ -269,8 +283,7 @@ fun TravelScreen(eventViewModel: EventViewModel) {
             modifier = Modifier
                 .padding(vertical = 10.dp)
                 .fillMaxWidth()
-                .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(15.dp))
-                .focusRequester(focusRequester),
+                .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(15.dp)),
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences,
                 imeAction = ImeAction.Done
