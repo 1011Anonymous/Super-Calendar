@@ -129,6 +129,11 @@ fun CalendarView(
         state.firstDayOfWeek = daysOfWeek.first()
     }
 
+    LaunchedEffect(key1 = visibleMonthInScrolling) {
+        selectedDate = null
+        homeViewModel.selectedDate = LocalDate.now().toString()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -139,6 +144,7 @@ fun CalendarView(
             goToPrevious = {
                 coroutineScope.launch {
                     state.animateScrollToMonth(state.firstVisibleMonth.yearMonth.previousMonth)
+
                     //homeViewModel.setVisibleMonth(visibleMonthInScrolling.yearMonth.previousMonth)
                 }
             },
@@ -171,7 +177,11 @@ fun CalendarView(
                     eventViewModel = eventViewModel
                 ) { calendarDay ->
                     selectedDate = if (selectedDate == calendarDay.date) null else calendarDay.date
-                    homeViewModel.selectedDate = selectedDate.toString()
+                    if (selectedDate == null) {
+                        homeViewModel.selectedDate = LocalDate.now().toString()
+                    } else {
+                        homeViewModel.selectedDate = selectedDate.toString()
+                    }
                 }
             },
             monthHeader = {
