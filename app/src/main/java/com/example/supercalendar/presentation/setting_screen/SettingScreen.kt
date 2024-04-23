@@ -62,6 +62,10 @@ fun SettingScreen(
         mutableStateOf(false)
     }
 
+    var hideEvent by remember {
+        mutableStateOf(false)
+    }
+
     var openLocationDialog by remember {
         mutableStateOf(false)
     }
@@ -230,7 +234,7 @@ fun SettingScreen(
 
             Text(
                 modifier = Modifier.padding(start = 20.dp, top = 8.dp),
-                text = "提醒",
+                text = "事件",
                 style = smallTitleTextStyle,
                 color = MaterialTheme.colorScheme.inversePrimary
             )
@@ -240,16 +244,17 @@ fun SettingScreen(
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RectangleShape,
-                contentPadding = PaddingValues(start = 0.dp, end = 245.dp)
+                contentPadding = PaddingValues(start = 0.dp, end = 225.dp)
             ) {
                 Text(
-                    text = "自定义通知",
+                    text = "默认提醒时间",
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = bigTitleTextStyle
                 )
             }
             Spacer(modifier = Modifier.size(10.dp))
 
+            /*
             TextButton(
                 onClick = { },
                 modifier = Modifier
@@ -272,6 +277,7 @@ fun SettingScreen(
                 }
             }
             Spacer(modifier = Modifier.size(15.dp))
+            */
 
             TextButton(
                 onClick = { },
@@ -311,6 +317,26 @@ fun SettingScreen(
                 Switch(
                     checked = notificationShakeState.value,
                     onCheckedChange = { notificationShakeState.value = it }
+                )
+            }
+            Spacer(modifier = Modifier.size(8.dp))
+
+            TextButton(
+                onClick = { hideEvent = !hideEvent },
+                modifier = Modifier
+                    .fillMaxWidth(),
+                shape = RectangleShape,
+                //contentPadding = PaddingValues(start = 0.dp, end = 215.dp)
+            ) {
+                Text(
+                    text = "隐藏事件",
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    style = bigTitleTextStyle
+                )
+                Spacer(modifier = Modifier.width(210.dp))
+                Switch(
+                    checked = hideEvent,
+                    onCheckedChange = { hideEvent = it }
                 )
             }
             Spacer(modifier = Modifier.size(8.dp))
