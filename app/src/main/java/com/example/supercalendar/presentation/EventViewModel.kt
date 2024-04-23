@@ -34,6 +34,9 @@ class EventViewModel @Inject constructor(
         )
     )
 
+    var notificationWay1 by mutableStateOf("")
+    var notificationWay2 by mutableStateOf("")
+    var interval by mutableStateOf("")
 
     val getAllEvents = repository.getAllEvents()
     private var deletedEvent: Event? = null
@@ -107,6 +110,18 @@ class EventViewModel @Inject constructor(
 
     fun updateCategory(newValue: Int) {
         eventForUpdate = eventForUpdate.copy(category = newValue)
+    }
+
+    fun updateNotificationWay1(newValue: String) {
+        notificationWay1 = newValue
+    }
+
+    fun updateNotificationWay2(newValue: String) {
+        notificationWay2 = newValue
+    }
+
+    fun updateInterval(newValue: String) {
+        interval = newValue
     }
 
 }

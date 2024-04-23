@@ -39,17 +39,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.supercalendar.R
 import com.example.supercalendar.constant.Const.Companion.chineseNumerals
 import com.example.supercalendar.domain.model.event.Event
 import com.example.supercalendar.presentation.EventViewModel
+import com.example.supercalendar.presentation.components.InterValDialog
+import com.example.supercalendar.presentation.components.NotificationDialog1
 import com.example.supercalendar.presentation.components.TimePickerDialog
 import com.example.supercalendar.ui.theme.taskTextStyle
 import com.example.supercalendar.utils.DateUtils
@@ -65,6 +65,13 @@ import java.util.Locale
 fun ReminderScreen(
     eventViewModel: EventViewModel
 ) {
+    var openNotification by remember {
+        mutableStateOf(false)
+    }
+    var openInterval by remember {
+        mutableStateOf(false)
+    }
+
     Column(
         modifier = Modifier
             .padding(10.dp)
@@ -236,9 +243,9 @@ fun ReminderScreen(
 
         TextButton(
             modifier = Modifier.fillMaxWidth(),
-            onClick = { /*TODO*/ }
+            onClick = { openNotification = true }
         ) {
-            Text(text = "任务发生时")
+            Text(text = eventViewModel.notificationWay1)
             Spacer(modifier = Modifier.width(260.dp))
         }
         Divider(modifier = Modifier.padding(bottom = 20.dp))
@@ -247,12 +254,26 @@ fun ReminderScreen(
 
         TextButton(
             modifier = Modifier.fillMaxWidth(),
-            onClick = { /*TODO*/ }
+            onClick = { openInterval = true }
         ) {
-            Text(text = "不重复")
+            Text(text = eventViewModel.interval)
             Spacer(modifier = Modifier.width(270.dp))
         }
 
+    }
+
+    NotificationDialog1(
+        openDialog = openNotification,
+        eventViewModel = eventViewModel
+    ) {
+        openNotification = false
+    }
+
+    InterValDialog(
+        openDialog = openInterval,
+        eventViewModel = eventViewModel
+    ) {
+        openInterval = false
     }
 }
 
