@@ -27,6 +27,12 @@ data class SettingStatus(
     val firstDayOfWeek: String,
     val isHighlight: Boolean,
     val isHideWeather: Boolean,
+    val notification: String,
+    val schedule: String,
+    val wholeDay: String,
+    val birthday: String,
+    val isVibrate: Boolean,
+    val isHideEvent: Boolean
 )
 
 @Singleton
@@ -43,6 +49,12 @@ class StoreUserSettings @Inject constructor(@ApplicationContext context: Context
         val FIRST_DAY_OF_WEEK_KEY = stringPreferencesKey("first_day_of_week")
         val IS_HIGHLIGHT_KEY = booleanPreferencesKey("is_highlight")
         val IS_HIDE_WEATHER_KEY = booleanPreferencesKey("is_hide_weather")
+        val NOTIFICATION_KEY = stringPreferencesKey("notification")
+        val SCHEDULE_KEY = stringPreferencesKey("schedule")
+        val WHOLE_DAY_KEY = stringPreferencesKey("whole_day")
+        val BIRTHDAY_KEY = stringPreferencesKey("birthday")
+        val IS_VIBRATE_KEY = booleanPreferencesKey("is_vibrate")
+        val IS_HIDE_EVENT_KEY = booleanPreferencesKey("is_hide_event")
     }
 
 
@@ -62,6 +74,12 @@ class StoreUserSettings @Inject constructor(@ApplicationContext context: Context
             val isWeekday = preferences[PreferencesKeys.IS_WEEKDAY_KEY] ?: false
             val isHideWeather = preferences[PreferencesKeys.IS_HIDE_WEATHER_KEY] ?: false
             val firstDayOfWeek = preferences[PreferencesKeys.FIRST_DAY_OF_WEEK_KEY] ?: "周一"
+            val notification = preferences[PreferencesKeys.NOTIFICATION_KEY] ?: "任务发生时"
+            val schedule = preferences[PreferencesKeys.SCHEDULE_KEY] ?: "任务发生时"
+            val wholeDay = preferences[PreferencesKeys.WHOLE_DAY_KEY] ?: "09:00"
+            val birthday = preferences[PreferencesKeys.BIRTHDAY_KEY] ?: "09:00"
+            val isVibrate = preferences[PreferencesKeys.IS_VIBRATE_KEY] ?: false
+            val isHideEvent = preferences[PreferencesKeys.IS_HIDE_EVENT_KEY] ?: false
 
             SettingStatus(
                 isDark,
@@ -71,12 +89,18 @@ class StoreUserSettings @Inject constructor(@ApplicationContext context: Context
                 isWeekday,
                 firstDayOfWeek,
                 isHighlight,
-                isHideWeather
+                isHideWeather,
+                notification,
+                schedule,
+                wholeDay,
+                birthday,
+                isVibrate,
+                isHideEvent
             )
         }
 
     suspend fun updateIsDark(isDark: String) {
-        myPreferencesDataStore.edit {preferences ->
+        myPreferencesDataStore.edit { preferences ->
             preferences[PreferencesKeys.IS_DARK_KEY] = isDark
         }
     }
@@ -106,8 +130,8 @@ class StoreUserSettings @Inject constructor(@ApplicationContext context: Context
     }
 
     suspend fun updateFirstDayOfWeek(dayOfWeek: DayOfWeek) {
-        myPreferencesDataStore.edit {preferences ->
-            preferences[PreferencesKeys.FIRST_DAY_OF_WEEK_KEY] = when(dayOfWeek) {
+        myPreferencesDataStore.edit { preferences ->
+            preferences[PreferencesKeys.FIRST_DAY_OF_WEEK_KEY] = when (dayOfWeek) {
                 DayOfWeek.MONDAY -> "周一"
                 DayOfWeek.SATURDAY -> "周六"
                 DayOfWeek.SUNDAY -> "周日"
@@ -125,6 +149,42 @@ class StoreUserSettings @Inject constructor(@ApplicationContext context: Context
     suspend fun updateIsHideWeather(isHideWeather: Boolean) {
         myPreferencesDataStore.edit { preferences ->
             preferences[PreferencesKeys.IS_HIDE_WEATHER_KEY] = isHideWeather
+        }
+    }
+
+    suspend fun updateNotification(notification: String) {
+        myPreferencesDataStore.edit { preferences ->
+            preferences[PreferencesKeys.NOTIFICATION_KEY] = notification
+        }
+    }
+
+    suspend fun updateSchedule(schedule: String) {
+        myPreferencesDataStore.edit { preferences ->
+            preferences[PreferencesKeys.SCHEDULE_KEY] = schedule
+        }
+    }
+
+    suspend fun updateWholeDay(wholeDay: String) {
+        myPreferencesDataStore.edit { preferences ->
+            preferences[PreferencesKeys.WHOLE_DAY_KEY] = wholeDay
+        }
+    }
+
+    suspend fun updateBirthday(birthday: String) {
+        myPreferencesDataStore.edit { preferences ->
+            preferences[PreferencesKeys.BIRTHDAY_KEY] = birthday
+        }
+    }
+
+    suspend fun updateIsVibrate(isVibrate: Boolean) {
+        myPreferencesDataStore.edit { preferences ->
+            preferences[PreferencesKeys.IS_VIBRATE_KEY] = isVibrate
+        }
+    }
+
+    suspend fun updateIsHideEvent(isHideEvent: Boolean) {
+        myPreferencesDataStore.edit { preferences ->
+            preferences[PreferencesKeys.IS_HIDE_EVENT_KEY] = isHideEvent
         }
     }
 

@@ -30,6 +30,7 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,10 +49,11 @@ import com.example.supercalendar.R
 import com.example.supercalendar.constant.Const
 import com.example.supercalendar.domain.model.event.Event
 import com.example.supercalendar.presentation.EventViewModel
+import com.example.supercalendar.presentation.components.NotificationDialog1
 import com.example.supercalendar.presentation.components.TimePickerDialog
 import com.example.supercalendar.ui.theme.taskTextStyle
 import com.example.supercalendar.utils.DateUtils
-import com.example.supercalendar.utils.convertMillisToLocalTime
+import com.example.supercalendar.utils.TimeUtils
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -61,6 +63,16 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TravelScreen(eventViewModel: EventViewModel) {
+    var openNotification by remember {
+        mutableStateOf(false)
+    }
+
+    val defaultNotification by eventViewModel.notification.collectAsState(initial = "")
+    LaunchedEffect(key1 = true) {  // key1 can be a specific condition or variable
+        eventViewModel.updateNotificationWay1(defaultNotification)
+    }
+
+
     Column(
         modifier = Modifier
             .padding(10.dp)
@@ -90,25 +102,18 @@ fun TravelScreen(eventViewModel: EventViewModel) {
             mutableStateOf(false)
         }
 
-        var dateText by remember {
-            mutableStateOf("${LocalDate.now().year}年" +
-                    "${LocalDate.now().monthValue}月" +
-                    "${LocalDate.now().dayOfMonth}日" +
-                    Const.chineseNumerals[LocalDate.now().dayOfWeek.value])
+        var date by remember {
+            mutableStateOf(LocalDate.now())
         }
-        var dateISO by remember {
-            mutableStateOf(LocalDate.now().toString())
-        }
-
-        val time = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault()).format(LocalTime.now())
-        var timeText by remember {
-            mutableStateOf(time)
+        var time by remember {
+            mutableStateOf(LocalTime.now())
         }
 
         eventViewModel.eventForInsert = Event(
             description = text,
-            startDate = dateISO,
-            startTime = timeText,
+            startDate = date,
+            startTime = time,
+            advance = eventViewModel.notificationWay1,
             departurePlace = departure,
             arrivePlace = arrive,
             category = 3
@@ -128,9 +133,8 @@ fun TravelScreen(eventViewModel: EventViewModel) {
                             val selectedDate = Calendar.getInstance().apply {
                                 this.timeInMillis = datePickerState.selectedDateMillis!!
                             }
-                            val localDate = DateUtils.convertMillisToLocalDate(selectedDate.timeInMillis)
-                            dateText = DateUtils.dateToString(localDate)
-                            dateISO = DateUtils.dateToStringISO(localDate)
+                            date = DateUtils.convertMillisToLocalDate(selectedDate.timeInMillis)
+
                             showDatePicker = false
                         }
                     ) { Text("确定") }
@@ -157,9 +161,7 @@ fun TravelScreen(eventViewModel: EventViewModel) {
                             cal.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
                             cal.set(Calendar.MINUTE, timePickerState.minute)
                             cal.isLenient = false
-                            timeText = DateTimeFormatter
-                                .ofPattern("HH:mm", Locale.getDefault())
-                                .format(convertMillisToLocalTime(cal.timeInMillis))
+                            time = TimeUtils.convertMillisToLocalTime(cal.timeInMillis)
                             showTimePicker = false
                         }
                     ) { Text("确定") }
@@ -216,13 +218,13 @@ fun TravelScreen(eventViewModel: EventViewModel) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             TextButton(onClick = { showDatePicker = true }) {
-                Text(text = dateText)
+                Text(text = DateUtils.dateToString(date))
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
             TextButton(onClick = { showTimePicker = true }) {
-                Text(text = timeText)
+                Text(text = TimeUtils.convertLocalTimeToString(time))
             }
         }
         Divider(modifier = Modifier.padding(bottom = 20.dp))
@@ -234,9 +236,13 @@ fun TravelScreen(eventViewModel: EventViewModel) {
 
         TextButton(
             modifier = Modifier.fillMaxWidth(),
-            onClick = { /*TODO*/ }
+            onClick = { openNotification = true }
         ) {
-            Text(text = "任务发生时")
+            Text(text = eventViewModel.notificationWay1)
+            // 将EventViewModel添加到SettingScreen中方便设置默认提醒时间
+            // SettingScreen -> notificationWay1, notificationWay1-> text, NotificationDialog -> notificationWay1
+            // 在EventScreen中判断notificationWay1来进行获取提醒时间，删除NotificationDialog中判断提醒时间的部分
+            // 判断后，在EventScreen中最将notificationWay1恢复到设置中的值
             Spacer(modifier = Modifier.width(260.dp))
         }
         Divider(modifier = Modifier.padding(bottom = 20.dp))
@@ -304,6 +310,12 @@ fun TravelScreen(eventViewModel: EventViewModel) {
             textStyle = taskTextStyle
         )
 
+    }
+    NotificationDialog1(
+        openDialog = openNotification,
+        eventViewModel = eventViewModel
+    ) {
+        openNotification = false
     }
 }
 

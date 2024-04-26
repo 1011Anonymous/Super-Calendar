@@ -1,5 +1,6 @@
 package com.example.supercalendar.presentation.components
 
+import android.app.AlarmManager
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,7 +44,8 @@ fun InterValDialog(
                                     selected = selectedOption == option,
                                     onClick = {
                                         selectedOption = option
-                                        eventViewModel.updateInterval(option)
+                                        eventViewModel.updateIntervalText(option)
+
                                         onClose()
                                     }
                                 )

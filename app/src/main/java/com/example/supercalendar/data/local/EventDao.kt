@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.example.supercalendar.domain.model.event.Event
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 
 @Dao
 interface EventDao {
@@ -35,6 +36,6 @@ interface EventDao {
         WHERE :date BETWEEN startDate AND COALESCE(endDate, startDate)
         ORDER BY startTime ASC
     """)
-    fun getEventsByDate(date: String): Flow<List<Event>>
+    fun getEventsByDate(date: LocalDate): Flow<List<Event>>
 
 }

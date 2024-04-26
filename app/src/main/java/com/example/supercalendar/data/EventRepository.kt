@@ -3,6 +3,7 @@ package com.example.supercalendar.data
 import com.example.supercalendar.data.local.EventDao
 import com.example.supercalendar.domain.model.event.Event
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 
 class EventRepository(
     private val dao: EventDao
@@ -17,5 +18,5 @@ class EventRepository(
 
     fun getAllEvents(): Flow<List<Event>> = dao.getAll()
 
-    fun getEventsByDate(date: String): Flow<List<Event>> = dao.getEventsByDate(date)
+    fun getEventsByDate(date: LocalDate): Flow<List<Event>> = dao.getEventsByDate(date)
 }

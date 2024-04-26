@@ -14,7 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -31,6 +30,7 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,7 +45,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.example.supercalendar.R
-import com.example.supercalendar.constant.Const.Companion.chineseNumerals
 import com.example.supercalendar.domain.model.event.Event
 import com.example.supercalendar.presentation.EventViewModel
 import com.example.supercalendar.presentation.components.InterValDialog
@@ -53,12 +52,11 @@ import com.example.supercalendar.presentation.components.NotificationDialog1
 import com.example.supercalendar.presentation.components.TimePickerDialog
 import com.example.supercalendar.ui.theme.taskTextStyle
 import com.example.supercalendar.utils.DateUtils
-import com.example.supercalendar.utils.convertMillisToLocalTime
+import com.example.supercalendar.utils.TimeUtils.Companion.convertLocalTimeToString
+import com.example.supercalendar.utils.TimeUtils.Companion.convertMillisToLocalTime
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import java.util.Calendar
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,6 +69,18 @@ fun ReminderScreen(
     var openInterval by remember {
         mutableStateOf(false)
     }
+
+    val defaultNotification by eventViewModel.notification.collectAsState(initial = "")
+    //eventViewModel.updateNotificationWay1(defaultNotification)
+
+    LaunchedEffect(key1 = true) {  // key1 can be a specific condition or variable
+        eventViewModel.updateNotificationWay1(defaultNotification)
+    }
+
+    LaunchedEffect(key1 = true) {
+        eventViewModel.updateIntervalText("不重复")
+    }
+
 
     Column(
         modifier = Modifier
@@ -95,6 +105,7 @@ fun ReminderScreen(
             mutableStateOf(false)
         }
 
+        /*
         var dateText by remember {
             mutableStateOf(
                 "${LocalDate.now().year}年" +
@@ -104,18 +115,29 @@ fun ReminderScreen(
             )
         }
         var dateISO by remember {
-            mutableStateOf(LocalDate.now().toString())
+            mutableStateOf(LocalDate.now())
+        }
+        */
+
+        var date by remember {
+            mutableStateOf(LocalDate.now())
         }
 
-        val time = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault()).format(LocalTime.now())
-        var timeText by remember {
-            mutableStateOf(time)
+      //  val time = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault()).format(LocalTime.now())
+//        var timeText by remember {
+//            mutableStateOf(time)
+//        }
+
+        var time by remember {
+            mutableStateOf(LocalTime.now())
         }
 
         eventViewModel.eventForInsert = Event(
             description = text,
-            startDate = dateISO,
-            startTime = timeText,
+            startDate = date,
+            startTime = time,
+            advance = eventViewModel.notificationWay1,
+            repeat = eventViewModel.intervalText,
             category = 0
         )
 
@@ -133,10 +155,12 @@ fun ReminderScreen(
                             val selectedDate = Calendar.getInstance().apply {
                                 this.timeInMillis = datePickerState.selectedDateMillis!!
                             }
-                            val localDate =
-                                DateUtils.convertMillisToLocalDate(selectedDate.timeInMillis)
-                            dateText = DateUtils.dateToString(localDate)
-                            dateISO = DateUtils.dateToStringISO(localDate)
+                            date = DateUtils.convertMillisToLocalDate(selectedDate.timeInMillis)
+//                            dateText = DateUtils.dateToString(localDate)
+//                            dateISO = DateUtils.dateToStringISO(localDate)
+//                            eventViewModel.updateYear(date.year)
+//                            eventViewModel.updateMonth(date.monthValue)
+//                            eventViewModel.updateDay(date.dayOfMonth)
                             showDatePicker = false
                         }
                     ) { Text("确定") }
@@ -163,9 +187,9 @@ fun ReminderScreen(
                             cal.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
                             cal.set(Calendar.MINUTE, timePickerState.minute)
                             cal.isLenient = false
-                            timeText = DateTimeFormatter
-                                .ofPattern("HH:mm", Locale.getDefault())
-                                .format(convertMillisToLocalTime(cal.timeInMillis))
+                            time = convertMillisToLocalTime(cal.timeInMillis)
+//                            eventViewModel.updateHour(time.hour)
+//                            eventViewModel.updateMinute(time.minute)
                             showTimePicker = false
                         }
                     ) { Text("确定") }
@@ -225,13 +249,13 @@ fun ReminderScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             TextButton(onClick = { showDatePicker = true }) {
-                Text(text = dateText)
+                Text(text = DateUtils.dateToString(date))
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
             TextButton(onClick = { showTimePicker = true }) {
-                Text(text = timeText)
+                Text(text = convertLocalTimeToString(time))
             }
         }
         Divider(modifier = Modifier.padding(bottom = 20.dp))
@@ -250,13 +274,16 @@ fun ReminderScreen(
         }
         Divider(modifier = Modifier.padding(bottom = 20.dp))
 
-        Icon(imageVector = Icons.Outlined.Refresh, contentDescription = null)
+        Icon(
+            painter = painterResource(id = R.drawable.outline_event_repeat_24),
+            contentDescription = null
+        )
 
         TextButton(
             modifier = Modifier.fillMaxWidth(),
             onClick = { openInterval = true }
         ) {
-            Text(text = eventViewModel.interval)
+            Text(text = eventViewModel.intervalText)
             Spacer(modifier = Modifier.width(270.dp))
         }
 

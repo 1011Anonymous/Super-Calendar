@@ -2,7 +2,6 @@ package com.example.supercalendar.presentation.event_screen
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,6 +39,7 @@ import com.example.supercalendar.domain.model.event.Event
 import com.example.supercalendar.presentation.EventViewModel
 import com.example.supercalendar.presentation.common.toastMsg
 import com.example.supercalendar.ui.theme.topAppBarTextStyle
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -49,7 +49,6 @@ fun EventScreen(
 ) {
     val context = LocalContext.current
     var event = eventViewModel.eventForInsert
-
 
     Scaffold(
         topBar = {
@@ -71,7 +70,8 @@ fun EventScreen(
                             eventViewModel.insertEvent(event)
                             event = Event(
                                 description = "",
-                                startDate = "",
+                                startDate = LocalDate.now(),
+                                advance = "",
                                 category = 0
                             )
                             onBack()
@@ -113,7 +113,7 @@ fun EventScreen(
             TabRow(
                 selectedTabIndex = selectedTab,
                 modifier = Modifier.padding(8.dp)
-                ) {
+            ) {
                 for (index in 0 until pagerState.pageCount) {
                     Tab(
                         selected = selectedTab == index,
@@ -157,14 +157,26 @@ fun EventScreen(
 
             HorizontalPager(state = pagerState) {
 
+
                 when (it) {
                     0 -> ReminderScreen(eventViewModel = eventViewModel)
                     1 -> TaskScreen(eventViewModel = eventViewModel)
                     2 -> BirthdayScreen(eventViewModel = eventViewModel)
                     else -> TravelScreen(eventViewModel = eventViewModel)
                 }
+
             }
         }
+    }
+}
+
+@Composable
+fun ScreenTest(page: Int) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = "${page + 1}")
     }
 }
 

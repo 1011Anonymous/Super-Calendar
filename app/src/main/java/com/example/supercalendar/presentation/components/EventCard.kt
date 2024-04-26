@@ -24,6 +24,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.supercalendar.domain.model.event.Event
 import com.example.supercalendar.ui.theme.taskTextStyle
+import com.example.supercalendar.utils.DateUtils
+import com.example.supercalendar.utils.DateUtils.Companion.dateToString
+import com.example.supercalendar.utils.TimeUtils
+import com.example.supercalendar.utils.TimeUtils.Companion.convertLocalTimeToString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,14 +48,14 @@ fun EventCard(
                 .padding(horizontal = 8.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            /*
+
             IconButton(
                 onClick = { onDone() },
                 modifier = Modifier.weight(1f)
             ) {
                 Icon(imageVector = Icons.Rounded.Delete, contentDescription = null)
             }
-            */
+
             Column(
                 modifier = Modifier.padding(start = 8.dp)
                     //.weight(8f)
@@ -69,24 +73,24 @@ fun EventCard(
 
                 Text(
                     text = when (event.category) {
-                        0 -> event.startTime!!
-                        1 -> "${event.startDate} ${event.startTime} ~ ${event.endDate} ${event.endTime}"
+                        1 -> if (event.isAllDay == true) "全天" else
+                            "${dateToString(event.startDate)} ${convertLocalTimeToString(event.startTime!!)} ~ ${dateToString(event.endDate!!)} ${convertLocalTimeToString(event.endTime!!)}"
                         2 -> "全天"
-                        else -> "${event.startDate} ${event.startTime}"
+                        else -> convertLocalTimeToString(event.startTime!!)
                     },
                     fontSize = 10.sp,
                     color = Color.Gray
                 )
             }
 
-            /*
+
             IconButton(
                 onClick = { onUpdate(event.id) },
                 modifier = Modifier.weight(1f)
             ) {
                 Icon(imageVector = Icons.Rounded.Edit, contentDescription = null)
             }
-            */
+
 
         }
     }

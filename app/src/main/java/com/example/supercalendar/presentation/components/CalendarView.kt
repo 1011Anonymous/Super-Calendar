@@ -131,7 +131,7 @@ fun CalendarView(
 
     LaunchedEffect(key1 = visibleMonthInScrolling) {
         selectedDate = null
-        homeViewModel.selectedDate = LocalDate.now().toString()
+        homeViewModel.selectedDate = LocalDate.now()
     }
 
     Column(
@@ -178,9 +178,9 @@ fun CalendarView(
                 ) { calendarDay ->
                     selectedDate = if (selectedDate == calendarDay.date) null else calendarDay.date
                     if (selectedDate == null) {
-                        homeViewModel.selectedDate = LocalDate.now().toString()
+                        homeViewModel.selectedDate = LocalDate.now()
                     } else {
-                        homeViewModel.selectedDate = selectedDate.toString()
+                        homeViewModel.selectedDate = selectedDate!!
                     }
                 }
             },
@@ -236,7 +236,7 @@ fun Day(
     onClick: (CalendarDay) -> Unit
 ) {
     val events by
-    eventViewModel.getEventsByDate(day.date.toString()).collectAsState(initial = emptyList())
+    eventViewModel.getEventsByDate(day.date).collectAsState(initial = emptyList())
 
 
     Box(

@@ -66,7 +66,7 @@ class HomeViewModel @Inject constructor(
     }
     //var displayWeekday  by mutableStateOf(true)
 
-    var selectedDate by mutableStateOf(LocalDate.now().toString())
+    var selectedDate: LocalDate by mutableStateOf(LocalDate.now())
 
 
     fun setVisibleMonth(yearMonth: YearMonth) {

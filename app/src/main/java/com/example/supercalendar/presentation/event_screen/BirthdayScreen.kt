@@ -47,6 +47,8 @@ import com.example.supercalendar.R
 import com.example.supercalendar.constant.Const
 import com.example.supercalendar.domain.model.event.Event
 import com.example.supercalendar.presentation.EventViewModel
+import com.example.supercalendar.presentation.components.NotificationDialog1
+import com.example.supercalendar.presentation.components.NotificationDialog2
 import com.example.supercalendar.ui.theme.taskTextStyle
 import com.example.supercalendar.utils.DateUtils
 import java.time.LocalDate
@@ -57,6 +59,13 @@ import java.util.Calendar
 fun BirthdayScreen(
     eventViewModel: EventViewModel
 ) {
+    var openNotification by remember {
+        mutableStateOf(false)
+    }
+    LaunchedEffect(key1 = true) {
+        eventViewModel.updateNotificationWay2("任务发生当天")
+    }
+
     Column(
         modifier = Modifier
             .padding(10.dp)
@@ -75,19 +84,24 @@ fun BirthdayScreen(
             mutableStateOf(false)
         }
 
-        var dateText by remember {
-            mutableStateOf("${LocalDate.now().year}年" +
-                    "${LocalDate.now().monthValue}月" +
-                    "${LocalDate.now().dayOfMonth}日" +
-                    Const.chineseNumerals[LocalDate.now().dayOfWeek.value])
-        }
-        var dateISO by remember {
-            mutableStateOf(LocalDate.now().toString())
+//        var dateText by remember {
+//            mutableStateOf("${LocalDate.now().year}年" +
+//                    "${LocalDate.now().monthValue}月" +
+//                    "${LocalDate.now().dayOfMonth}日" +
+//                    Const.chineseNumerals[LocalDate.now().dayOfWeek.value])
+//        }
+//        var dateISO by remember {
+//            mutableStateOf(LocalDate.now().toString())
+//        }
+
+        var date by remember {
+            mutableStateOf(LocalDate.now())
         }
 
         eventViewModel.eventForInsert = Event(
             description = text,
-            startDate = dateISO,
+            startDate = date,
+            advance = eventViewModel.notificationWay2,
             category = 2
         )
 
@@ -104,9 +118,9 @@ fun BirthdayScreen(
                             val selectedDate = Calendar.getInstance().apply {
                                 this.timeInMillis = datePickerState.selectedDateMillis!!
                             }
-                            val localDate = DateUtils.convertMillisToLocalDate(selectedDate.timeInMillis)
-                            dateText = DateUtils.dateToString(localDate)
-                            dateISO = DateUtils.dateToStringISO(localDate)
+                            date = DateUtils.convertMillisToLocalDate(selectedDate.timeInMillis)
+//                            dateText = DateUtils.dateToString(localDate)
+//                            dateISO = DateUtils.dateToStringISO(localDate)
                             showDatePicker = false
                         }
                     ) { Text("确定") }
@@ -164,7 +178,7 @@ fun BirthdayScreen(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { showDatePicker = true }
             ) {
-                Text(text = dateText)
+                Text(text = DateUtils.dateToString(date))
                 Spacer(modifier = Modifier.width(250.dp))
             }
         }
@@ -174,13 +188,16 @@ fun BirthdayScreen(
 
         TextButton(
             modifier = Modifier.fillMaxWidth(),
-            onClick = { /*TODO*/ }
+            onClick = { openNotification = true }
         ) {
-            Text(text = "任务发生当天")
+            Text(text = eventViewModel.notificationWay2)
             Spacer(modifier = Modifier.width(260.dp))
         }
-
-
-
+    }
+    NotificationDialog2(
+        openDialog = openNotification,
+        eventViewModel = eventViewModel
+    ) {
+        openNotification = false
     }
 }
