@@ -140,6 +140,14 @@ class EventViewModel @Inject constructor(
         eventForUpdate = eventForUpdate.copy(arrivePlace = newValue)
     }
 
+    fun updateAdvance(newValue: String) {
+        eventForUpdate = eventForUpdate.copy(advance = newValue)
+    }
+
+    fun updateRepeat(newValue: String) {
+        eventForUpdate = eventForUpdate.copy(repeat = newValue)
+    }
+
     fun updateCategory(newValue: Int) {
         eventForUpdate = eventForUpdate.copy(category = newValue)
     }

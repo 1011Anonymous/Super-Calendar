@@ -2,17 +2,10 @@ package com.example.supercalendar.presentation.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,23 +17,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.supercalendar.domain.model.event.Event
 import com.example.supercalendar.ui.theme.taskTextStyle
-import com.example.supercalendar.utils.DateUtils
 import com.example.supercalendar.utils.DateUtils.Companion.dateToString
-import com.example.supercalendar.utils.TimeUtils
 import com.example.supercalendar.utils.TimeUtils.Companion.convertLocalTimeToString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventCard(
     event: Event,
-    onDone: () -> Unit,
-    onUpdate: (id: Int) -> Unit
+    onClick: (id: Int) -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        onClick = {  }
+        onClick = { onClick(event.id) }
     ) {
         Row(
             modifier = Modifier
@@ -49,16 +39,16 @@ fun EventCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            IconButton(
+            /*IconButton(
                 onClick = { onDone() },
                 modifier = Modifier.weight(1f)
             ) {
                 Icon(imageVector = Icons.Rounded.Delete, contentDescription = null)
-            }
+            }*/
 
             Column(
                 modifier = Modifier.padding(start = 8.dp)
-                    //.weight(8f)
+                //.weight(8f)
             ) {
                 Text(
                     text = when (event.category) {
@@ -74,7 +64,12 @@ fun EventCard(
                 Text(
                     text = when (event.category) {
                         1 -> if (event.isAllDay == true) "全天" else
-                            "${dateToString(event.startDate)} ${convertLocalTimeToString(event.startTime!!)} ~ ${dateToString(event.endDate!!)} ${convertLocalTimeToString(event.endTime!!)}"
+                            "${dateToString(event.startDate)} ${convertLocalTimeToString(event.startTime!!)} ~ ${
+                                dateToString(
+                                    event.endDate!!
+                                )
+                            } ${convertLocalTimeToString(event.endTime!!)}"
+
                         2 -> "全天"
                         else -> convertLocalTimeToString(event.startTime!!)
                     },
@@ -84,12 +79,12 @@ fun EventCard(
             }
 
 
-            IconButton(
+            /*IconButton(
                 onClick = { onUpdate(event.id) },
                 modifier = Modifier.weight(1f)
             ) {
                 Icon(imageVector = Icons.Rounded.Edit, contentDescription = null)
-            }
+            }*/
 
 
         }

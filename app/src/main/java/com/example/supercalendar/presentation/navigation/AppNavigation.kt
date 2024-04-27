@@ -7,16 +7,20 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.supercalendar.presentation.EventViewModel
 import com.example.supercalendar.presentation.HomeViewModel
 import com.example.supercalendar.presentation.LocationViewModel
 import com.example.supercalendar.presentation.WeatherViewModel
+import com.example.supercalendar.presentation.detail_screen.ReminderDetail
 import com.example.supercalendar.presentation.event_screen.EventScreen
 import com.example.supercalendar.presentation.home_screen.HomeScreen
 import com.example.supercalendar.presentation.setting_screen.SettingScreen
+import com.example.supercalendar.presentation.update_screen.ReminderUpdate
 import com.example.supercalendar.presentation.weather_screen.WeatherScreen
 
 @Composable
@@ -41,7 +45,9 @@ fun AppNavigation(
                 weatherViewModel = weatherViewModel,
                 homeViewModel = homeViewModel,
                 eventViewModel = eventViewModel,
-                onUpdate = {  }
+                onClick = { id ->
+                    navController.navigate("${Screen.ReminderDetailScreen.name}/$id")
+                }
             )
         }
 
@@ -94,6 +100,32 @@ fun AppNavigation(
                 eventViewModel = eventViewModel,
                 onBack = { navController.popBackStack() }
             )
+        }
+
+        composable(
+            route = "${Screen.ReminderDetailScreen.name}/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { navBackStackEntry ->
+            ReminderDetail(
+                id = navBackStackEntry.arguments?.getInt("id")!!,
+                eventViewModel = eventViewModel,
+                onBack = { navController.popBackStack() },
+                onUpdate = { id ->
+                    navController.navigate("${Screen.UpdateReminderScreen.name}/$id")
+                }
+            )
+        }
+
+        composable(
+            route = "${Screen.UpdateReminderScreen.name}/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) {navBackStackEntry ->
+            ReminderUpdate(
+                id = navBackStackEntry.arguments?.getInt("id")!!,
+                eventViewModel = eventViewModel
+            ) {
+                navController.popBackStack()
+            }
         }
     }
 }

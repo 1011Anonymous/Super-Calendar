@@ -4,5 +4,7 @@ enum class Screen {
     HomeScreen,
     SettingScreen,
     WeatherScreen,
-    EventScreen
+    EventScreen,
+    ReminderDetailScreen,
+    UpdateReminderScreen
 }

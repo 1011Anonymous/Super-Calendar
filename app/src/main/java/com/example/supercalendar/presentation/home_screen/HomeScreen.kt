@@ -55,8 +55,8 @@ fun HomeScreen(
     eventViewModel: EventViewModel,
     locationViewModel: LocationViewModel,
     navController: NavController,
+    onClick: (id: Int) -> Unit,
     locationPermissionRequest: ActivityResultLauncher<Array<String>>,
-    onUpdate: (id: Int) -> Unit
 ) {
     val visibleMonth = homeViewModel.visibleMonthState.value
     val currentMonth = YearMonth.now()
@@ -222,7 +222,7 @@ fun HomeScreen(
                 ) { event ->
                     EventCard(
                         event = event,
-                        onDone = {
+                        /*onDone = {
                             eventViewModel.deleteEvent(event)
                             mySnackBar(
                                 scope = scope,
@@ -231,8 +231,8 @@ fun HomeScreen(
                                 actionLabel = "UNDO",
                                 onAction = { eventViewModel.undoDeleteEvent() }
                             )
-                        },
-                        onUpdate = onUpdate
+                        },*/
+                        onClick = onClick
                     )
                 }
             }
