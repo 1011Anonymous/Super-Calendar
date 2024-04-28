@@ -39,7 +39,7 @@ fun EventCard(
                 0 -> navController.navigate("${Screen.ReminderDetailScreen.name}/${event.id}")
                 1 -> navController.navigate("${Screen.TaskDetailScreen.name}/${event.id}")
                 2 -> navController.navigate("${Screen.BirthdayDetailScreen.name}/${event.id}")
-                else -> Log.e("Navigation Error", "Navigate to wrong ID")
+                else -> navController.navigate("${Screen.TravelDetailScreen.name}/${event.id}")
             }
         }
     ) {
