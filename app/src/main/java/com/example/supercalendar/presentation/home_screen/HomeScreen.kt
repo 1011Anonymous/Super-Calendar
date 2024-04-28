@@ -23,7 +23,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBar
@@ -40,7 +39,6 @@ import com.example.supercalendar.presentation.EventViewModel
 import com.example.supercalendar.presentation.HomeViewModel
 import com.example.supercalendar.presentation.LocationViewModel
 import com.example.supercalendar.presentation.WeatherViewModel
-import com.example.supercalendar.presentation.common.mySnackBar
 import com.example.supercalendar.presentation.components.CalendarView
 import com.example.supercalendar.presentation.components.EventCard
 import com.example.supercalendar.presentation.components.WeatherCard
@@ -232,7 +230,7 @@ fun HomeScreen(
                                 onAction = { eventViewModel.undoDeleteEvent() }
                             )
                         },*/
-                        onClick = onClick
+                        navController = navController
                     )
                 }
             }
