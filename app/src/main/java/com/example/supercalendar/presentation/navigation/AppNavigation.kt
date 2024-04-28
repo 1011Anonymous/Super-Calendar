@@ -16,11 +16,13 @@ import com.example.supercalendar.presentation.EventViewModel
 import com.example.supercalendar.presentation.HomeViewModel
 import com.example.supercalendar.presentation.LocationViewModel
 import com.example.supercalendar.presentation.WeatherViewModel
+import com.example.supercalendar.presentation.detail_screen.BirthdayDetail
 import com.example.supercalendar.presentation.detail_screen.ReminderDetail
 import com.example.supercalendar.presentation.detail_screen.TaskDetail
 import com.example.supercalendar.presentation.event_screen.EventScreen
 import com.example.supercalendar.presentation.home_screen.HomeScreen
 import com.example.supercalendar.presentation.setting_screen.SettingScreen
+import com.example.supercalendar.presentation.update_screen.BirthdayUpdate
 import com.example.supercalendar.presentation.update_screen.ReminderUpdate
 import com.example.supercalendar.presentation.update_screen.TaskUpdate
 import com.example.supercalendar.presentation.weather_screen.WeatherScreen
@@ -147,6 +149,30 @@ fun AppNavigation(
             arguments = listOf(navArgument("id") {type = NavType.IntType})
         ) {navBackStackEntry ->
             TaskUpdate(
+                id = navBackStackEntry.arguments?.getInt("id")!!,
+                eventViewModel = eventViewModel
+            ) {
+                navController.popBackStack()
+            }
+        }
+
+        composable(
+            route = "${Screen.BirthdayDetailScreen.name}/{id}",
+            arguments = listOf(navArgument("id") {type = NavType.IntType})
+        ) {navBackStackEntry ->
+            BirthdayDetail(
+                id = navBackStackEntry.arguments?.getInt("id")!!,
+                eventViewModel = eventViewModel,
+                onBack = { navController.popBackStack() }) {id ->
+                navController.navigate("${Screen.UpdateBirthdayScreen.name}/$id")
+            }
+        }
+
+        composable(
+            route = "${Screen.UpdateBirthdayScreen.name}/{id}",
+            arguments = listOf(navArgument("id") {type = NavType.IntType})
+        ) {navBackStackEntry ->
+            BirthdayUpdate(
                 id = navBackStackEntry.arguments?.getInt("id")!!,
                 eventViewModel = eventViewModel
             ) {

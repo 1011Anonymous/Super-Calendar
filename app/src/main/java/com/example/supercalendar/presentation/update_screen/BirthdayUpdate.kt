@@ -28,10 +28,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,50 +45,34 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.example.supercalendar.R
 import com.example.supercalendar.presentation.EventViewModel
-import com.example.supercalendar.presentation.components.AdvanceDialog1
-import com.example.supercalendar.presentation.components.RepeatDialog
-import com.example.supercalendar.presentation.components.TimePickerDialog
+import com.example.supercalendar.presentation.components.AdvanceDialog2
 import com.example.supercalendar.ui.theme.taskTextStyle
 import com.example.supercalendar.utils.DateUtils
-import com.example.supercalendar.utils.TimeUtils
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReminderUpdate(
+fun BirthdayUpdate(
     id: Int,
     eventViewModel: EventViewModel,
     onBack: () -> Unit
 ) {
-    var openNotification by remember {
+    var openDialog by remember {
         mutableStateOf(false)
     }
-    var openInterval by remember {
-        mutableStateOf(false)
-    }
-
     val focusManager = LocalFocusManager.current
-
     val datePickerState = rememberDatePickerState()
     var showDatePicker by remember {
         mutableStateOf(false)
     }
 
-    val timePickerState = rememberTimePickerState(is24Hour = true)
-    var showTimePicker by remember {
-        mutableStateOf(false)
-    }
-
     val desc = eventViewModel.eventForUpdate.description
     val date = eventViewModel.eventForUpdate.startDate
-    val time = eventViewModel.eventForUpdate.startTime!!
     val advance = eventViewModel.eventForUpdate.advance
-    val repeat = eventViewModel.eventForUpdate.repeat!!
 
     LaunchedEffect(key1 = true) {
         eventViewModel.getEventById(id)
     }
-
 
     if (showDatePicker) {
         DatePickerDialog(
@@ -119,38 +101,10 @@ fun ReminderUpdate(
         }
     }
 
-    if (showTimePicker) {
-        TimePickerDialog(
-            onDismissRequest = { showTimePicker = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        val cal = Calendar.getInstance()
-                        cal.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
-                        cal.set(Calendar.MINUTE, timePickerState.minute)
-                        cal.isLenient = false
-                        val newValue = TimeUtils.convertMillisToLocalTime(cal.timeInMillis)
-                        eventViewModel.updateStartTime(newValue)
-                        showTimePicker = false
-                    }
-                ) { Text("确定") }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        showTimePicker = false
-                    }
-                ) { Text("取消") }
-            }
-        ) {
-            TimePicker(state = timePickerState)
-        }
-    }
-
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "编辑提醒") },
+                title = { Text(text = "编辑生日") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = null)
@@ -166,7 +120,7 @@ fun ReminderUpdate(
                 }
             )
         }
-    ) { paddingValues ->
+    ) {paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -178,7 +132,7 @@ fun ReminderUpdate(
                 onValueChange = { newValue ->
                     eventViewModel.updateDescription(newValue)
                 },
-                placeholder = { Text(text = "请输入提醒") },
+                placeholder = { Text(text = "请输入姓名") },
                 shape = RoundedCornerShape(15.dp),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -205,25 +159,19 @@ fun ReminderUpdate(
 
             Spacer(modifier = Modifier.size(20.dp))
 
-            Icon(
-                painter = painterResource(id = R.drawable.outline_access_time_24),
-                contentDescription = null
-            )
-
+            Icon(painter = painterResource(id = R.drawable.outline_access_time_24), contentDescription = null)
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                TextButton(onClick = { showDatePicker = true }) {
+                TextButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { showDatePicker = true }
+                ) {
                     Text(text = DateUtils.dateToString(date))
-                }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                TextButton(onClick = { showTimePicker = true }) {
-                    Text(text = TimeUtils.convertLocalTimeToString(time))
+                    Spacer(modifier = Modifier.width(250.dp))
                 }
             }
             Divider(modifier = Modifier.padding(bottom = 20.dp))
@@ -232,36 +180,16 @@ fun ReminderUpdate(
                 painter = painterResource(id = R.drawable.outline_notifications_active_24),
                 contentDescription = null
             )
-
             TextButton(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { openNotification = true }
+                onClick = { openDialog= true }
             ) {
                 Text(text = advance)
                 Spacer(modifier = Modifier.width(260.dp))
             }
-            Divider(modifier = Modifier.padding(bottom = 20.dp))
-
-            Icon(
-                painter = painterResource(id = R.drawable.outline_event_repeat_24),
-                contentDescription = null
-            )
-
-            TextButton(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { openInterval = true }
-            ) {
-                Text(text = repeat)
-                Spacer(modifier = Modifier.width(270.dp))
-            }
         }
     }
-
-    AdvanceDialog1(openDialog = openNotification, id = id, eventViewModel = eventViewModel) {
-        openNotification = false
-    }
-
-    RepeatDialog(openDialog = openInterval, id = id, eventViewModel = eventViewModel) {
-        openInterval = false
+    AdvanceDialog2(openDialog = openDialog, id = id, eventViewModel = eventViewModel) {
+        openDialog = false
     }
 }

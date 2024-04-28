@@ -19,13 +19,68 @@ import androidx.compose.ui.unit.dp
 import com.example.supercalendar.presentation.EventViewModel
 
 @Composable
-fun AdvanceDialog(
+fun AdvanceDialog1(
     openDialog: Boolean,
     id: Int,
     eventViewModel: EventViewModel,
     onClose: () -> Unit
 ) {
     val options = listOf("不提醒", "任务发生时", "5分钟前", "15分钟前", "30分钟前", "1小时前")
+    var selectedOption: String by remember {
+        mutableStateOf(options[1])
+    }
+
+    LaunchedEffect(key1 = true) {
+        eventViewModel.getEventById(id)
+    }
+
+    if (openDialog) {
+        AlertDialog(
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                ) {
+                    options.forEach { option ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .selectable(
+                                    selected = selectedOption == option,
+                                    onClick = {
+                                        selectedOption = option
+                                        eventViewModel.updateAdvance(option)
+                                        onClose()
+                                    }
+                                )
+                                .padding(16.dp),
+                        ) {
+                            RadioButton(
+                                selected = selectedOption == option,
+                                onClick = null
+                            )
+                            Text(
+                                text = option,
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                        }
+                    }
+                }
+            },
+            onDismissRequest = { onClose() },
+            confirmButton = { /*TODO*/ }
+        )
+    }
+}
+
+@Composable
+fun AdvanceDialog2(
+    openDialog: Boolean,
+    id: Int,
+    eventViewModel: EventViewModel,
+    onClose: () -> Unit
+) {
+    val options = listOf("不提醒", "任务发生当天", "1天前", "2天前", "3天前", "1周前")
     var selectedOption: String by remember {
         mutableStateOf(options[1])
     }

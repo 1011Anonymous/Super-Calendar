@@ -8,5 +8,9 @@ enum class Screen {
     ReminderDetailScreen,
     UpdateReminderScreen,
     TaskDetailScreen,
-    UpdateTaskScreen
+    UpdateTaskScreen,
+    BirthdayDetailScreen,
+    UpdateBirthdayScreen,
+    TravelDetailScreen,
+    UpdateTravelScreen
 }

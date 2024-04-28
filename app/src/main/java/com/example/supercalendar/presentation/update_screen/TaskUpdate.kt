@@ -40,7 +40,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
@@ -49,7 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.supercalendar.R
 import com.example.supercalendar.presentation.EventViewModel
-import com.example.supercalendar.presentation.components.AdvanceDialog
+import com.example.supercalendar.presentation.components.AdvanceDialog1
 import com.example.supercalendar.presentation.components.RepeatDialog
 import com.example.supercalendar.presentation.components.TimePickerDialog
 import com.example.supercalendar.ui.theme.taskTextStyle
@@ -356,7 +355,7 @@ fun TaskUpdate(
             }
         }
     }
-    AdvanceDialog(openDialog = openNotification, id = id, eventViewModel = eventViewModel) {
+    AdvanceDialog1(openDialog = openNotification, id = id, eventViewModel = eventViewModel) {
         openNotification = false
     }
 
