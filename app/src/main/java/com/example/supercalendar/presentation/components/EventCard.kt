@@ -37,6 +37,7 @@ fun EventCard(
         onClick = {
             when (event.category) {
                 0 -> navController.navigate("${Screen.ReminderDetailScreen.name}/${event.id}")
+                1 -> navController.navigate("${Screen.TaskDetailScreen.name}/${event.id}")
                 else -> Log.e("Navigation Error", "Navigate to wrong ID")
             }
         }

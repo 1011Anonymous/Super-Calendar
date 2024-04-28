@@ -419,7 +419,7 @@ fun TaskScreen(
         }
         Divider(modifier = Modifier.padding(bottom = 20.dp))
 
-        Icon(imageVector = Icons.Outlined.Refresh, contentDescription = null)
+        Icon(painter = painterResource(id = R.drawable.outline_event_repeat_24), contentDescription = null)
 
         TextButton(
             modifier = Modifier.fillMaxWidth(),

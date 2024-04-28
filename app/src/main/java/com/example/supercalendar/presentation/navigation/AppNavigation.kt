@@ -17,10 +17,12 @@ import com.example.supercalendar.presentation.HomeViewModel
 import com.example.supercalendar.presentation.LocationViewModel
 import com.example.supercalendar.presentation.WeatherViewModel
 import com.example.supercalendar.presentation.detail_screen.ReminderDetail
+import com.example.supercalendar.presentation.detail_screen.TaskDetail
 import com.example.supercalendar.presentation.event_screen.EventScreen
 import com.example.supercalendar.presentation.home_screen.HomeScreen
 import com.example.supercalendar.presentation.setting_screen.SettingScreen
 import com.example.supercalendar.presentation.update_screen.ReminderUpdate
+import com.example.supercalendar.presentation.update_screen.TaskUpdate
 import com.example.supercalendar.presentation.weather_screen.WeatherScreen
 
 @Composable
@@ -119,8 +121,32 @@ fun AppNavigation(
         composable(
             route = "${Screen.UpdateReminderScreen.name}/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
-        ) {navBackStackEntry ->
+        ) { navBackStackEntry ->
             ReminderUpdate(
+                id = navBackStackEntry.arguments?.getInt("id")!!,
+                eventViewModel = eventViewModel
+            ) {
+                navController.popBackStack()
+            }
+        }
+
+        composable(
+            route = "${Screen.TaskDetailScreen.name}/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { navBackStackEntry ->
+            TaskDetail(
+                id = navBackStackEntry.arguments?.getInt("id")!!,
+                eventViewModel = eventViewModel,
+                onBack = { navController.popBackStack() }) { id ->
+                navController.navigate("${Screen.UpdateTaskScreen.name}/$id")
+            }
+        }
+
+        composable(
+            route = "${Screen.UpdateTaskScreen.name}/{id}",
+            arguments = listOf(navArgument("id") {type = NavType.IntType})
+        ) {navBackStackEntry ->
+            TaskUpdate(
                 id = navBackStackEntry.arguments?.getInt("id")!!,
                 eventViewModel = eventViewModel
             ) {

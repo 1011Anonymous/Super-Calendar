@@ -6,5 +6,7 @@ enum class Screen {
     WeatherScreen,
     EventScreen,
     ReminderDetailScreen,
-    UpdateReminderScreen
+    UpdateReminderScreen,
+    TaskDetailScreen,
+    UpdateTaskScreen
 }
