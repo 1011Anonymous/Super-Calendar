@@ -116,4 +116,7 @@ dependencies {
     //DataStore
     implementation(libs.androidx.datastore.preferences)
 
+    //Permission
+    implementation(libs.accompanist.permissions)
+
 }

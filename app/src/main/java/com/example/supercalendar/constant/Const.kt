@@ -37,5 +37,7 @@ class Const {
         const val NA = "?"
         const val UNKNOWN = "未知"
         const val LOADING = "_"
+
+
     }
 }

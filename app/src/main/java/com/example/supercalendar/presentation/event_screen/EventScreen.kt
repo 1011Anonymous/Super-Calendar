@@ -1,5 +1,17 @@
 package com.example.supercalendar.presentation.event_screen
 
+import android.Manifest
+import android.app.AlarmManager
+import android.app.AlarmManager.AlarmClockInfo
+import android.app.PendingIntent
+import android.content.Context.ALARM_SERVICE
+import android.content.Intent
+import android.os.Build
+import android.provider.Settings
+import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -13,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,14 +47,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
+import com.example.supercalendar.MyAlarm
 import com.example.supercalendar.R
 import com.example.supercalendar.domain.model.event.Event
 import com.example.supercalendar.presentation.EventViewModel
 import com.example.supercalendar.presentation.common.toastMsg
 import com.example.supercalendar.ui.theme.topAppBarTextStyle
+import com.example.supercalendar.utils.DateUtils.Companion.dateToString
+import com.example.supercalendar.utils.TimeUtils.Companion.convertLocalTimeToString
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import java.time.LocalDate
+import java.util.Calendar
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@OptIn(
+    ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class,
+    ExperimentalPermissionsApi::class
+)
 @Composable
 fun EventScreen(
     eventViewModel: EventViewModel,
@@ -49,6 +74,74 @@ fun EventScreen(
 ) {
     val context = LocalContext.current
     var event = eventViewModel.eventForInsert
+    val postNotificationPermission =
+        rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+    /*val contentTitle = when (event.category) {
+        0 -> "[提醒] ${event.description}"
+        1 -> "[日程] ${event.description}"
+        2 -> "[生日] ${event.description}"
+        else -> "[出行] ${event.description}"
+    }
+    val contentText = when (event.category) {
+        0 -> "${
+            event.startTime?.let {
+                convertLocalTimeToString(
+                    it
+                )
+            }
+        }"
+
+        1 -> if (event.isAllDay == true) "${dateToString(event.startDate)} ~ ${
+            event.endDate?.let {
+                dateToString(
+                    it
+                )
+            }
+        }"
+        else "${dateToString(event.startDate)} ${
+            event.startTime?.let {
+                convertLocalTimeToString(
+                    it
+                )
+            }
+        } ~ ${event.endDate?.let { dateToString(it) }} ${
+            event.endTime?.let {
+                convertLocalTimeToString(
+                    it
+                )
+            }
+        }"
+
+        2 -> dateToString(event.startDate)
+        else -> "${
+            event.startTime?.let {
+                convertLocalTimeToString(
+                    it
+                )
+            }
+        }"
+    }
+    val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
+    val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+        Log.d("AlarmSetup", "Sending Alarm with ID: ${event.id}, Title: $contentTitle")
+
+        intent.putExtra("UniqueID", event.id)
+        intent.putExtra("ContentTitle", contentTitle)
+        intent.putExtra("ContentText", contentText)
+
+        PendingIntent.getBroadcast(
+            context,
+            event.id,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }*/
+
+    LaunchedEffect(key1 = true) {
+        if (!postNotificationPermission.status.isGranted) {
+            postNotificationPermission.launchPermissionRequest()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -66,8 +159,84 @@ fun EventScreen(
                 },
                 actions = {
                     IconButton(onClick = {
+                        eventViewModel.insertEvent(event)
+                        val contentTitle = when (event.category) {
+                            0 -> "[提醒] ${event.description}"
+                            1 -> "[日程] ${event.description}"
+                            2 -> "[生日] ${event.description}"
+                            else -> "[出行] ${event.description}"
+                        }
+                        val contentText = when (event.category) {
+                            0 -> "${
+                                event.startTime?.let {
+                                    convertLocalTimeToString(
+                                        it
+                                    )
+                                }
+                            }"
+
+                            1 -> if (event.isAllDay == true) "${dateToString(event.startDate)} ~ ${
+                                event.endDate?.let {
+                                    dateToString(
+                                        it
+                                    )
+                                }
+                            }"
+                            else "${dateToString(event.startDate)} ${
+                                event.startTime?.let {
+                                    convertLocalTimeToString(
+                                        it
+                                    )
+                                }
+                            } ~ ${event.endDate?.let { dateToString(it) }} ${
+                                event.endTime?.let {
+                                    convertLocalTimeToString(
+                                        it
+                                    )
+                                }
+                            }"
+
+                            2 -> dateToString(event.startDate)
+                            else -> "${
+                                event.startTime?.let {
+                                    convertLocalTimeToString(
+                                        it
+                                    )
+                                }
+                            }"
+                        }
+                        val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
+                        val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                            Log.d("AlarmSetup", "Sending Alarm with ID: ${event.id}, Title: $contentTitle")
+
+                            intent.putExtra("UniqueID", event.id)
+                            intent.putExtra("ContentTitle", contentTitle)
+                            intent.putExtra("ContentText", contentText)
+
+                            PendingIntent.getBroadcast(
+                                context,
+                                event.id,
+                                intent,
+                                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                            )
+                        }
+
                         if (event.description.isNotBlank()) {
-                            eventViewModel.insertEvent(event)
+                            val calendar = Calendar.getInstance().apply {
+                                timeInMillis = System.currentTimeMillis()
+                                set(2024, 4, 29, 19, 5, 0)
+                            }
+                            val alarmClockInfo = AlarmClockInfo(calendar.timeInMillis, alarmIntent)
+
+                            if (alarmManager.canScheduleExactAlarms()) {
+                                alarmManager.setAlarmClock(
+                                    alarmClockInfo,
+                                    alarmIntent
+                                )
+                                Log.d("AlarmClock", "Clock Set")
+                            } else {
+                                context.startActivity(Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM))
+                            }
                             event = Event(
                                 description = "",
                                 startDate = LocalDate.now(),
@@ -82,7 +251,7 @@ fun EventScreen(
                             )
                         }
                     }) {
-                        Icon(imageVector = Icons.Filled.Check, contentDescription = null)
+                        Icon(imageVector = Icons.Filled.Done, contentDescription = null)
                     }
                 }
             )

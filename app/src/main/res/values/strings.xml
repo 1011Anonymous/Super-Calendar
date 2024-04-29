@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Super Calendar</string>
+    <string name="notification_channel_id">Channel-1</string>
+    <string name="notification_channel_name">Calendar-Notification</string>
 </resources>
