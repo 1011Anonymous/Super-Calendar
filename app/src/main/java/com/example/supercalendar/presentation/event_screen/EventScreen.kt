@@ -61,6 +61,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import java.time.LocalDate
 import java.util.Calendar
+import kotlin.random.Random
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(
@@ -72,8 +73,8 @@ fun EventScreen(
     eventViewModel: EventViewModel,
     onBack: () -> Unit
 ) {
-    val context = LocalContext.current
     var event = eventViewModel.eventForInsert
+    val context = LocalContext.current
     val postNotificationPermission =
         rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
     /*val contentTitle = when (event.category) {
@@ -159,72 +160,72 @@ fun EventScreen(
                 },
                 actions = {
                     IconButton(onClick = {
-                        eventViewModel.insertEvent(event)
-                        val contentTitle = when (event.category) {
-                            0 -> "[提醒] ${event.description}"
-                            1 -> "[日程] ${event.description}"
-                            2 -> "[生日] ${event.description}"
-                            else -> "[出行] ${event.description}"
-                        }
-                        val contentText = when (event.category) {
-                            0 -> "${
-                                event.startTime?.let {
-                                    convertLocalTimeToString(
-                                        it
-                                    )
-                                }
-                            }"
-
-                            1 -> if (event.isAllDay == true) "${dateToString(event.startDate)} ~ ${
-                                event.endDate?.let {
-                                    dateToString(
-                                        it
-                                    )
-                                }
-                            }"
-                            else "${dateToString(event.startDate)} ${
-                                event.startTime?.let {
-                                    convertLocalTimeToString(
-                                        it
-                                    )
-                                }
-                            } ~ ${event.endDate?.let { dateToString(it) }} ${
-                                event.endTime?.let {
-                                    convertLocalTimeToString(
-                                        it
-                                    )
-                                }
-                            }"
-
-                            2 -> dateToString(event.startDate)
-                            else -> "${
-                                event.startTime?.let {
-                                    convertLocalTimeToString(
-                                        it
-                                    )
-                                }
-                            }"
-                        }
-                        val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
-                        val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
-                            Log.d("AlarmSetup", "Sending Alarm with ID: ${event.id}, Title: $contentTitle")
-
-                            intent.putExtra("UniqueID", event.id)
-                            intent.putExtra("ContentTitle", contentTitle)
-                            intent.putExtra("ContentText", contentText)
-
-                            PendingIntent.getBroadcast(
-                                context,
-                                event.id,
-                                intent,
-                                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                            )
-                        }
-
                         if (event.description.isNotBlank()) {
+                            eventViewModel.insertEvent(event)
+                            val newID = Random.nextInt()
+                            val contentTitle = when (event.category) {
+                                0 -> "[提醒] ${event.description}"
+                                1 -> "[日程] ${event.description}"
+                                2 -> "[生日] ${event.description}"
+                                else -> "[出行] ${event.description}"
+                            }
+                            val contentText = when (event.category) {
+                                0 -> "${
+                                    event.startTime?.let {
+                                        convertLocalTimeToString(
+                                            it
+                                        )
+                                    }
+                                }"
+
+                                1 -> if (event.isAllDay == true) "${dateToString(event.startDate)} ~ ${
+                                    event.endDate?.let {
+                                        dateToString(
+                                            it
+                                        )
+                                    }
+                                }"
+                                else "${dateToString(event.startDate)} ${
+                                    event.startTime?.let {
+                                        convertLocalTimeToString(
+                                            it
+                                        )
+                                    }
+                                } ~ ${event.endDate?.let { dateToString(it) }} ${
+                                    event.endTime?.let {
+                                        convertLocalTimeToString(
+                                            it
+                                        )
+                                    }
+                                }"
+
+                                2 -> dateToString(event.startDate)
+                                else -> "${
+                                    event.startTime?.let {
+                                        convertLocalTimeToString(
+                                            it
+                                        )
+                                    }
+                                }"
+                            }
+                            val alarmManager = context.getSystemService(ComponentActivity.ALARM_SERVICE) as AlarmManager
+                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                intent.putExtra("UniqueID", newID)
+                                intent.putExtra("ContentTitle", contentTitle)
+                                intent.putExtra("ContentText", contentText)
+
+                                PendingIntent.getBroadcast(
+                                    context,
+                                    newID,
+                                    intent,
+                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                )
+                            }
                             val calendar = Calendar.getInstance().apply {
                                 timeInMillis = System.currentTimeMillis()
-                                set(2024, 4, 29, 19, 5, 0)
+                                set(2024, 3, 30, 18, 6, 0)
                             }
                             val alarmClockInfo = AlarmClockInfo(calendar.timeInMillis, alarmIntent)
 

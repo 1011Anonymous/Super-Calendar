@@ -31,6 +31,10 @@
         </activity>
         <receiver
             android:name=".MyAlarm"
+            android:enabled="true">
+        </receiver>
+        <receiver
+            android:name=".PermissionChangeReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
