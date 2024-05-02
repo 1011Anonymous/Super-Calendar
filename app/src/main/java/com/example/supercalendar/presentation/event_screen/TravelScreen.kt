@@ -114,6 +114,7 @@ fun TravelScreen(eventViewModel: EventViewModel) {
             startDate = date,
             startTime = time,
             advance = eventViewModel.notificationWay1,
+            repeat = "不重复",
             departurePlace = departure,
             arrivePlace = arrive,
             category = 3

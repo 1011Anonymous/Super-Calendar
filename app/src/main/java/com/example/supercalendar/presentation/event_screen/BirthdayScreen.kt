@@ -102,6 +102,7 @@ fun BirthdayScreen(
             description = text,
             startDate = date,
             advance = eventViewModel.notificationWay2,
+            repeat = "每年",
             category = 2
         )
 

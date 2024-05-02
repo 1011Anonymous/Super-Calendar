@@ -23,6 +23,7 @@ data class Event(
     val repeat: String? = null,
     val departurePlace: String? = null,
     val arrivePlace: String? = null,
+    val uniqueId: Int? = null,
     //0->提醒，1->日程，2->生日，3->出行
     val category: Int
 
