@@ -52,6 +52,7 @@ import com.example.supercalendar.presentation.components.NotificationDialog2
 import com.example.supercalendar.ui.theme.taskTextStyle
 import com.example.supercalendar.utils.DateUtils
 import java.time.LocalDate
+import java.time.LocalTime
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -101,6 +102,7 @@ fun BirthdayScreen(
         eventViewModel.eventForInsert = Event(
             description = text,
             startDate = date,
+            startTime = LocalTime.of(9,0),
             advance = eventViewModel.notificationWay2,
             repeat = "每年",
             category = 2

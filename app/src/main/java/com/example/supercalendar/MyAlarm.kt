@@ -40,7 +40,7 @@ class MyAlarm : BroadcastReceiver() {
             }
             when (repeatType) {
                 1 -> {
-                    calendar.add(Calendar.MINUTE, 1)
+                    calendar.add(Calendar.DAY_OF_MONTH, 1)
                     val alarmIntent = Intent(context, MyAlarm::class.java).let { intent1 ->
                         intent1.putExtra("RepeatType", repeatType)
                         intent1.putExtra("TimeInMillis", calendar.timeInMillis)
