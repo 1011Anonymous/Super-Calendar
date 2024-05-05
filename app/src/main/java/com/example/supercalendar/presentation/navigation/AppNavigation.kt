@@ -1,6 +1,8 @@
 package com.example.supercalendar.presentation.navigation
 
+import android.os.Build
 import androidx.activity.result.ActivityResultLauncher
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
@@ -29,6 +31,7 @@ import com.example.supercalendar.presentation.update_screen.TaskUpdate
 import com.example.supercalendar.presentation.update_screen.TravelUpdate
 import com.example.supercalendar.presentation.weather_screen.WeatherScreen
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun AppNavigation(
     eventViewModel: EventViewModel,

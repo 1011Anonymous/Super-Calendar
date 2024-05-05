@@ -159,6 +159,7 @@ fun ReminderUpdate(
                 actions = {
                     IconButton(onClick = {
                         eventViewModel.updateEvent(eventViewModel.eventForUpdate)
+
                         onBack()
                     }) {
                         Icon(imageVector = Icons.Filled.Done, contentDescription = null)
