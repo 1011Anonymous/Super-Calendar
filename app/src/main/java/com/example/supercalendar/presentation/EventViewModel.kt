@@ -183,6 +183,13 @@ class EventViewModel @Inject constructor(
         )
     }
 
+    fun updateNotifyForUpdate(newValue1: LocalDate, newValue2: LocalTime) {
+        eventForUpdate = eventForUpdate.copy(
+            notifyDate = newValue1,
+            notifyTime = newValue2
+        )
+    }
+
     fun updateRepeatForInsert(newValue: String) {
         eventForInsert = eventForInsert.copy(
             repeat = newValue

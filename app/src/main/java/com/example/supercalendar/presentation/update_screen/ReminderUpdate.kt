@@ -1,5 +1,13 @@
 package com.example.supercalendar.presentation.update_screen
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Intent
+import android.os.Build
+import android.provider.Settings
+import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -40,11 +48,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
+import com.example.supercalendar.MyAlarm
 import com.example.supercalendar.R
 import com.example.supercalendar.presentation.EventViewModel
 import com.example.supercalendar.presentation.components.AdvanceDialog1
@@ -53,8 +63,10 @@ import com.example.supercalendar.presentation.components.TimePickerDialog
 import com.example.supercalendar.ui.theme.taskTextStyle
 import com.example.supercalendar.utils.DateUtils
 import com.example.supercalendar.utils.TimeUtils
+import java.time.LocalDateTime
 import java.util.Calendar
 
+@RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReminderUpdate(
@@ -80,6 +92,56 @@ fun ReminderUpdate(
     var showTimePicker by remember {
         mutableStateOf(false)
     }
+
+    var event = eventViewModel.eventForUpdate
+    val context = LocalContext.current
+    val newID = event.uniqueId!!
+    val contentTitle = when (event.category) {
+        0 -> "[提醒] ${event.description}"
+        1 -> "[日程] ${event.description}"
+        2 -> "[生日] ${event.description}"
+        else -> "[出行] ${event.description}"
+    }
+    val contentText = when (event.category) {
+        0 -> "${
+            event.startTime?.let {
+                TimeUtils.convertLocalTimeToString(
+                    it
+                )
+            }
+        }"
+
+        1 -> if (event.isAllDay == true) "${DateUtils.dateToString(event.startDate)} ~ ${
+            event.endDate?.let {
+                DateUtils.dateToString(
+                    it
+                )
+            }
+        }"
+        else "${DateUtils.dateToString(event.startDate)} ${
+            event.startTime?.let {
+                TimeUtils.convertLocalTimeToString(
+                    it
+                )
+            }
+        } ~ ${event.endDate?.let { DateUtils.dateToString(it) }} ${
+            event.endTime?.let {
+                TimeUtils.convertLocalTimeToString(
+                    it
+                )
+            }
+        }"
+
+        2 -> DateUtils.dateToString(event.startDate)
+        else -> "${
+            event.startTime?.let {
+                TimeUtils.convertLocalTimeToString(
+                    it
+                )
+            }
+        }"
+    }
+    val alarmManager = context.getSystemService(ComponentActivity.ALARM_SERVICE) as AlarmManager
 
     val desc = eventViewModel.eventForUpdate.description
     val date = eventViewModel.eventForUpdate.startDate
@@ -158,8 +220,2023 @@ fun ReminderUpdate(
                 },
                 actions = {
                     IconButton(onClick = {
-                        eventViewModel.updateEvent(eventViewModel.eventForUpdate)
+                        when (event.advance) {
+                            "不提醒" -> {}
+                            "任务发生时" -> {
+                                eventViewModel.updateNotifyForUpdate(
+                                    event.startDate,
+                                    event.startTime!!
+                                )
+                                event = eventViewModel.eventForUpdate
+                                val calendar = Calendar.getInstance().apply {
+                                    timeInMillis = System.currentTimeMillis()
+                                    event.notifyDate?.let { date ->
+                                        event.notifyTime?.let {time ->
+                                            set(
+                                                date.year,
+                                                date.monthValue - 1,
+                                                date.dayOfMonth,
+                                                time.hour,
+                                                time.minute,
+                                                0
+                                            )
+                                        }
+                                    }
+                                }
 
+                                if (event.repeat == null || event.repeat == "不重复") {
+                                    val alarmIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                        Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                        intent.putExtra("RepeatType", 0)
+                                        intent.putExtra("TimeInMillis", calendar.timeInMillis)
+                                        intent.putExtra("UniqueID", newID)
+                                        intent.putExtra("ContentTitle", contentTitle)
+                                        intent.putExtra("ContentText", contentText)
+
+                                        PendingIntent.getBroadcast(
+                                            context,
+                                            newID,
+                                            intent,
+                                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                        )
+                                    }
+                                    val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                        calendar.timeInMillis,
+                                        alarmIntent
+                                    )
+                                    if (alarmManager.canScheduleExactAlarms()) {
+                                        alarmManager.setAlarmClock(
+                                            alarmClockInfo,
+                                            alarmIntent
+                                        )
+                                        Log.d("AlarmClock", "Clock Set")
+                                    } else {
+                                        context.startActivity(
+                                            Intent(
+                                                Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                            )
+                                        )
+                                    }
+                                } else {
+                                    when (event.repeat) {
+                                        "每天" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 1)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每周" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 2)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每月" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 3)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每年" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 4)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            "5分钟前" -> {
+                                val scheduledTime = LocalDateTime.of(
+                                    eventViewModel.eventForUpdate.startDate,
+                                    eventViewModel.eventForUpdate.startTime!!
+                                )
+                                val newTime = TimeUtils.subtractTimeFromDateTime(
+                                    scheduledTime,
+                                    5,
+                                    0
+                                )
+                                eventViewModel.updateNotifyForUpdate(
+                                    newTime.toLocalDate(),
+                                    newTime.toLocalTime()
+                                )
+                                event = eventViewModel.eventForUpdate
+                                val calendar = Calendar.getInstance().apply {
+                                    timeInMillis = System.currentTimeMillis()
+                                    event.notifyDate?.let { date ->
+                                        event.notifyTime?.let { time ->
+                                            set(
+                                                date.year,
+                                                date.monthValue - 1,
+                                                date.dayOfMonth,
+                                                time.hour,
+                                                time.minute,
+                                                0
+                                            )
+                                        }
+                                    }
+                                }
+                                if (event.repeat == null || event.repeat == "不重复") {
+                                    val alarmIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                        Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                        intent.putExtra("RepeatType", 0)
+                                        intent.putExtra("TimeInMillis", calendar.timeInMillis)
+                                        intent.putExtra("UniqueID", newID)
+                                        intent.putExtra("ContentTitle", contentTitle)
+                                        intent.putExtra("ContentText", contentText)
+
+                                        PendingIntent.getBroadcast(
+                                            context,
+                                            newID,
+                                            intent,
+                                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                        )
+                                    }
+                                    val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                        calendar.timeInMillis,
+                                        alarmIntent
+                                    )
+                                    if (alarmManager.canScheduleExactAlarms()) {
+                                        alarmManager.setAlarmClock(
+                                            alarmClockInfo,
+                                            alarmIntent
+                                        )
+                                        Log.d("AlarmClock", "Clock Set")
+                                    } else {
+                                        context.startActivity(
+                                            Intent(
+                                                Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                            )
+                                        )
+                                    }
+                                } else {
+                                    when (event.repeat) {
+                                        "每天" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 1)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每周" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 2)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每月" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 3)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每年" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 4)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            "15分钟前" -> {
+                                val scheduledTime = LocalDateTime.of(
+                                    eventViewModel.eventForUpdate.startDate,
+                                    eventViewModel.eventForUpdate.startTime!!
+                                )
+                                val newTime = TimeUtils.subtractTimeFromDateTime(
+                                    scheduledTime,
+                                    15,
+                                    0
+                                )
+                                eventViewModel.updateNotifyForUpdate(
+                                    newTime.toLocalDate(),
+                                    newTime.toLocalTime()
+                                )
+                                event = eventViewModel.eventForUpdate
+                                val calendar = Calendar.getInstance().apply {
+                                    timeInMillis = System.currentTimeMillis()
+                                    event.notifyDate?.let { date ->
+                                        event.notifyTime?.let { time ->
+                                            set(
+                                                date.year,
+                                                date.monthValue - 1,
+                                                date.dayOfMonth,
+                                                time.hour,
+                                                time.minute,
+                                                0
+                                            )
+                                        }
+                                    }
+                                }
+                                if (event.repeat == null || event.repeat == "不重复") {
+                                    val alarmIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                        Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                        intent.putExtra("RepeatType", 0)
+                                        intent.putExtra("TimeInMillis", calendar.timeInMillis)
+                                        intent.putExtra("UniqueID", newID)
+                                        intent.putExtra("ContentTitle", contentTitle)
+                                        intent.putExtra("ContentText", contentText)
+
+                                        PendingIntent.getBroadcast(
+                                            context,
+                                            newID,
+                                            intent,
+                                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                        )
+                                    }
+                                    val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                        calendar.timeInMillis,
+                                        alarmIntent
+                                    )
+                                    if (alarmManager.canScheduleExactAlarms()) {
+                                        alarmManager.setAlarmClock(
+                                            alarmClockInfo,
+                                            alarmIntent
+                                        )
+                                        Log.d("AlarmClock", "Clock Set")
+                                    } else {
+                                        context.startActivity(
+                                            Intent(
+                                                Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                            )
+                                        )
+                                    }
+                                } else {
+                                    when (event.repeat) {
+                                        "每天" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 1)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每周" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 2)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每月" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 3)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每年" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 4)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            "30分钟前" -> {
+                                val scheduledTime = LocalDateTime.of(
+                                    eventViewModel.eventForUpdate.startDate,
+                                    eventViewModel.eventForUpdate.startTime!!
+                                )
+                                val newTime = TimeUtils.subtractTimeFromDateTime(
+                                    scheduledTime,
+                                    30,
+                                    0
+                                )
+                                eventViewModel.updateNotifyForUpdate(
+                                    newTime.toLocalDate(),
+                                    newTime.toLocalTime()
+                                )
+                                event = eventViewModel.eventForUpdate
+                                val calendar = Calendar.getInstance().apply {
+                                    timeInMillis = System.currentTimeMillis()
+                                    event.notifyDate?.let { date ->
+                                        event.notifyTime?.let { time ->
+                                            set(
+                                                date.year,
+                                                date.monthValue - 1,
+                                                date.dayOfMonth,
+                                                time.hour,
+                                                time.minute,
+                                                0
+                                            )
+                                        }
+                                    }
+                                }
+                                if (event.repeat == null || event.repeat == "不重复") {
+                                    val alarmIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                        Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                        intent.putExtra("RepeatType", 0)
+                                        intent.putExtra("TimeInMillis", calendar.timeInMillis)
+                                        intent.putExtra("UniqueID", newID)
+                                        intent.putExtra("ContentTitle", contentTitle)
+                                        intent.putExtra("ContentText", contentText)
+
+                                        PendingIntent.getBroadcast(
+                                            context,
+                                            newID,
+                                            intent,
+                                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                        )
+                                    }
+                                    val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                        calendar.timeInMillis,
+                                        alarmIntent
+                                    )
+                                    if (alarmManager.canScheduleExactAlarms()) {
+                                        alarmManager.setAlarmClock(
+                                            alarmClockInfo,
+                                            alarmIntent
+                                        )
+                                        Log.d("AlarmClock", "Clock Set")
+                                    } else {
+                                        context.startActivity(
+                                            Intent(
+                                                Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                            )
+                                        )
+                                    }
+                                } else {
+                                    when (event.repeat) {
+                                        "每天" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 1)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每周" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 2)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每月" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 3)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每年" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 4)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                                event = event.copy(uniqueId = newID)
+                            }
+                            "1小时前" -> {
+                                val scheduledTime = LocalDateTime.of(
+                                    eventViewModel.eventForUpdate.startDate,
+                                    eventViewModel.eventForUpdate.startTime
+                                )
+                                val newTime = TimeUtils.subtractTimeFromDateTime(
+                                    scheduledTime,
+                                    0,
+                                    1
+                                )
+                                eventViewModel.updateNotifyForUpdate(
+                                    newTime.toLocalDate(),
+                                    newTime.toLocalTime()
+                                )
+                                event = eventViewModel.eventForUpdate
+                                val calendar = Calendar.getInstance().apply {
+                                    timeInMillis = System.currentTimeMillis()
+                                    event.notifyDate?.let { date ->
+                                        event.notifyTime?.let { time ->
+                                            set(
+                                                date.year,
+                                                date.monthValue - 1,
+                                                date.dayOfMonth,
+                                                time.hour,
+                                                time.minute,
+                                                0
+                                            )
+                                        }
+                                    }
+                                }
+                                if (event.repeat == null || event.repeat == "不重复") {
+                                    val alarmIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                        Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                        intent.putExtra("RepeatType", 0)
+                                        intent.putExtra("TimeInMillis", calendar.timeInMillis)
+                                        intent.putExtra("UniqueID", newID)
+                                        intent.putExtra("ContentTitle", contentTitle)
+                                        intent.putExtra("ContentText", contentText)
+
+                                        PendingIntent.getBroadcast(
+                                            context,
+                                            newID,
+                                            intent,
+                                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                        )
+                                    }
+                                    val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                        calendar.timeInMillis,
+                                        alarmIntent
+                                    )
+                                    if (alarmManager.canScheduleExactAlarms()) {
+                                        alarmManager.setAlarmClock(
+                                            alarmClockInfo,
+                                            alarmIntent
+                                        )
+                                        Log.d("AlarmClock", "Clock Set")
+                                    } else {
+                                        context.startActivity(
+                                            Intent(
+                                                Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                            )
+                                        )
+                                    }
+                                } else {
+                                    when (event.repeat) {
+                                        "每天" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 1)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每周" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 2)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每月" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 3)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每年" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 4)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                                event = event.copy(uniqueId = newID)
+                            }
+                            //删除下面，提醒界面不需要
+                            "1天前" -> {
+                                eventViewModel.eventForUpdate.startTime?.let {
+                                    eventViewModel.updateNotifyForUpdate(
+                                        newValue1 = eventViewModel.eventForInsert.startDate.minusDays(1),
+                                        newValue2 = it
+                                    )
+                                }
+                                event = eventViewModel.eventForUpdate
+                                val calendar = Calendar.getInstance().apply {
+                                    timeInMillis = System.currentTimeMillis()
+                                    event.notifyDate?.let { date ->
+                                        event.notifyTime?.let {time ->
+                                            set(
+                                                date.year,
+                                                date.monthValue - 1,
+                                                date.dayOfMonth,
+                                                time.hour,
+                                                time.minute,
+                                                0
+                                            )
+                                        }
+                                    }
+                                }
+
+                                if (event.repeat == null || event.repeat == "不重复") {
+                                    val alarmIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                        Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                        intent.putExtra("RepeatType", 0)
+                                        intent.putExtra("TimeInMillis", calendar.timeInMillis)
+                                        intent.putExtra("UniqueID", newID)
+                                        intent.putExtra("ContentTitle", contentTitle)
+                                        intent.putExtra("ContentText", contentText)
+
+                                        PendingIntent.getBroadcast(
+                                            context,
+                                            newID,
+                                            intent,
+                                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                        )
+                                    }
+                                    val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                        calendar.timeInMillis,
+                                        alarmIntent
+                                    )
+                                    if (alarmManager.canScheduleExactAlarms()) {
+                                        alarmManager.setAlarmClock(
+                                            alarmClockInfo,
+                                            alarmIntent
+                                        )
+                                        Log.d("AlarmClock", "Clock Set")
+                                    } else {
+                                        context.startActivity(
+                                            Intent(
+                                                Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                            )
+                                        )
+                                    }
+                                } else {
+                                    when (event.repeat) {
+                                        "每天" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 1)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每周" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 2)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每月" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 3)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每年" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 4)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            "2天前" -> {
+                                eventViewModel.eventForUpdate.startTime?.let {
+                                    eventViewModel.updateNotifyForUpdate(
+                                        newValue1 = eventViewModel.eventForUpdate.startDate.minusDays(2),
+                                        newValue2 = it
+                                    )
+                                }
+                                event = eventViewModel.eventForUpdate
+                                val calendar = Calendar.getInstance().apply {
+                                    timeInMillis = System.currentTimeMillis()
+                                    event.notifyDate?.let { date ->
+                                        event.notifyTime?.let {time ->
+                                            set(
+                                                date.year,
+                                                date.monthValue - 1,
+                                                date.dayOfMonth,
+                                                time.hour,
+                                                time.minute,
+                                                0
+                                            )
+                                        }
+                                    }
+                                }
+
+                                if (event.repeat == null || event.repeat == "不重复") {
+                                    val alarmIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                        Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                        intent.putExtra("RepeatType", 0)
+                                        intent.putExtra("TimeInMillis", calendar.timeInMillis)
+                                        intent.putExtra("UniqueID", newID)
+                                        intent.putExtra("ContentTitle", contentTitle)
+                                        intent.putExtra("ContentText", contentText)
+
+                                        PendingIntent.getBroadcast(
+                                            context,
+                                            newID,
+                                            intent,
+                                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                        )
+                                    }
+                                    val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                        calendar.timeInMillis,
+                                        alarmIntent
+                                    )
+                                    if (alarmManager.canScheduleExactAlarms()) {
+                                        alarmManager.setAlarmClock(
+                                            alarmClockInfo,
+                                            alarmIntent
+                                        )
+                                        Log.d("AlarmClock", "Clock Set")
+                                    } else {
+                                        context.startActivity(
+                                            Intent(
+                                                Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                            )
+                                        )
+                                    }
+                                } else {
+                                    when (event.repeat) {
+                                        "每天" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 1)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每周" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 2)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每月" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 3)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每年" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 4)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            "3天前" -> {
+                                eventViewModel.eventForUpdate.startTime?.let {
+                                    eventViewModel.updateNotifyForUpdate(
+                                        newValue1 = eventViewModel.eventForUpdate.startDate.minusDays(3),
+                                        newValue2 = it
+                                    )
+                                }
+                                event = eventViewModel.eventForUpdate
+                                val calendar = Calendar.getInstance().apply {
+                                    timeInMillis = System.currentTimeMillis()
+                                    event.notifyDate?.let { date ->
+                                        event.notifyTime?.let {time ->
+                                            set(
+                                                date.year,
+                                                date.monthValue - 1,
+                                                date.dayOfMonth,
+                                                time.hour,
+                                                time.minute,
+                                                0
+                                            )
+                                        }
+                                    }
+                                }
+
+                                if (event.repeat == null || event.repeat == "不重复") {
+                                    val alarmIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                        Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                        intent.putExtra("RepeatType", 0)
+                                        intent.putExtra("TimeInMillis", calendar.timeInMillis)
+                                        intent.putExtra("UniqueID", newID)
+                                        intent.putExtra("ContentTitle", contentTitle)
+                                        intent.putExtra("ContentText", contentText)
+
+                                        PendingIntent.getBroadcast(
+                                            context,
+                                            newID,
+                                            intent,
+                                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                        )
+                                    }
+                                    val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                        calendar.timeInMillis,
+                                        alarmIntent
+                                    )
+                                    if (alarmManager.canScheduleExactAlarms()) {
+                                        alarmManager.setAlarmClock(
+                                            alarmClockInfo,
+                                            alarmIntent
+                                        )
+                                        Log.d("AlarmClock", "Clock Set")
+                                    } else {
+                                        context.startActivity(
+                                            Intent(
+                                                Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                            )
+                                        )
+                                    }
+                                } else {
+                                    when (event.repeat) {
+                                        "每天" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 1)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每周" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 2)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每月" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 3)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每年" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 4)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            "1周前" -> {
+                                eventViewModel.eventForUpdate.startTime?.let {
+                                    eventViewModel.updateNotifyForUpdate(
+                                        newValue1 = eventViewModel.eventForUpdate.startDate.minusDays(7),
+                                        newValue2 = it
+                                    )
+                                }
+                                event = eventViewModel.eventForUpdate
+                                val calendar = Calendar.getInstance().apply {
+                                    timeInMillis = System.currentTimeMillis()
+                                    event.notifyDate?.let { date ->
+                                        event.notifyTime?.let {time ->
+                                            set(
+                                                date.year,
+                                                date.monthValue - 1,
+                                                date.dayOfMonth,
+                                                time.hour,
+                                                time.minute,
+                                                0
+                                            )
+                                        }
+                                    }
+                                }
+
+                                if (event.repeat == null || event.repeat == "不重复") {
+                                    val alarmIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                        Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                        intent.putExtra("RepeatType", 0)
+                                        intent.putExtra("TimeInMillis", calendar.timeInMillis)
+                                        intent.putExtra("UniqueID", newID)
+                                        intent.putExtra("ContentTitle", contentTitle)
+                                        intent.putExtra("ContentText", contentText)
+
+                                        PendingIntent.getBroadcast(
+                                            context,
+                                            newID,
+                                            intent,
+                                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                        )
+                                    }
+                                    val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                        calendar.timeInMillis,
+                                        alarmIntent
+                                    )
+                                    if (alarmManager.canScheduleExactAlarms()) {
+                                        alarmManager.setAlarmClock(
+                                            alarmClockInfo,
+                                            alarmIntent
+                                        )
+                                        Log.d("AlarmClock", "Clock Set")
+                                    } else {
+                                        context.startActivity(
+                                            Intent(
+                                                Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                            )
+                                        )
+                                    }
+                                } else {
+                                    when (event.repeat) {
+                                        "每天" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 1)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每周" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 2)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每月" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 3)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每年" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 4)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else -> {
+                                eventViewModel.updateNotifyForUpdate(
+                                    eventViewModel.eventForUpdate.startDate,
+                                    eventViewModel.eventForUpdate.startTime!!
+                                )
+                                event = eventViewModel.eventForUpdate
+                                val calendar = Calendar.getInstance().apply {
+                                    timeInMillis = System.currentTimeMillis()
+                                    event.notifyDate?.let { date ->
+                                        event.notifyTime?.let {time ->
+                                            set(
+                                                date.year,
+                                                date.monthValue - 1,
+                                                date.dayOfMonth,
+                                                time.hour,
+                                                time.minute,
+                                                0
+                                            )
+                                        }
+                                    }
+                                }
+
+                                if (event.repeat == null || event.repeat == "不重复") {
+                                    val alarmIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                        Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                        intent.putExtra("RepeatType", 0)
+                                        intent.putExtra("TimeInMillis", calendar.timeInMillis)
+                                        intent.putExtra("UniqueID", newID)
+                                        intent.putExtra("ContentTitle", contentTitle)
+                                        intent.putExtra("ContentText", contentText)
+
+                                        PendingIntent.getBroadcast(
+                                            context,
+                                            newID,
+                                            intent,
+                                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                        )
+                                    }
+                                    val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                        calendar.timeInMillis,
+                                        alarmIntent
+                                    )
+                                    if (alarmManager.canScheduleExactAlarms()) {
+                                        alarmManager.setAlarmClock(
+                                            alarmClockInfo,
+                                            alarmIntent
+                                        )
+                                        Log.d("AlarmClock", "Clock Set")
+                                    } else {
+                                        context.startActivity(
+                                            Intent(
+                                                Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                            )
+                                        )
+                                    }
+                                } else {
+                                    when (event.repeat) {
+                                        "每天" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 1)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每周" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 2)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每月" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 3)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        "每年" -> {
+                                            val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                                                Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                                                intent.putExtra("RepeatType", 4)
+                                                intent.putExtra("UniqueID", newID)
+                                                intent.putExtra("ContentTitle", contentTitle)
+                                                intent.putExtra("ContentText", contentText)
+
+                                                PendingIntent.getBroadcast(
+                                                    context,
+                                                    newID,
+                                                    intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                )
+                                            }
+                                            val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                                                calendar.timeInMillis,
+                                                alarmIntent
+                                            )
+                                            if (alarmManager.canScheduleExactAlarms()) {
+                                                alarmManager.setAlarmClock(
+                                                    alarmClockInfo,
+                                                    alarmIntent
+                                                )
+                                                Log.d("AlarmClock", "Clock Set")
+                                            } else {
+                                                context.startActivity(
+                                                    Intent(
+                                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        eventViewModel.updateEvent(event)
                         onBack()
                     }) {
                         Icon(imageVector = Icons.Filled.Done, contentDescription = null)
