@@ -119,31 +119,6 @@ fun TaskScreen(
             mutableStateOf(false)
         }
 
-        /*
-        var startDateText by remember {
-            mutableStateOf(
-                "${LocalDate.now().year}年" +
-                        "${LocalDate.now().monthValue}月" +
-                        "${LocalDate.now().dayOfMonth}日" +
-                        Const.chineseNumerals[LocalDate.now().dayOfWeek.value]
-            )
-        }
-        var startDateISO by remember {
-            mutableStateOf(LocalDate.now().toString())
-        }
-
-        var endDateText by remember {
-            mutableStateOf(
-                "${LocalDate.now().year}年" +
-                        "${LocalDate.now().monthValue}月" +
-                        "${LocalDate.now().dayOfMonth}日" +
-                        Const.chineseNumerals[LocalDate.now().dayOfWeek.value]
-            )
-        }
-        var endDateISO by remember {
-            mutableStateOf(LocalDate.now().toString())
-        }
-        */
         var startDate by remember {
             mutableStateOf(LocalDate.now())
         }
@@ -156,14 +131,6 @@ fun TaskScreen(
             endDate = startDate
         }
 
-//        val startTime = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault()).format(LocalTime.now())
-//        val endTime = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault()).format(LocalTime.now())
-//        var startTimeText by remember {
-//            mutableStateOf(startTime)
-//        }
-//        var endTimeText by remember {
-//            mutableStateOf(endTime)
-//        }
         var startTime by remember {
             mutableStateOf(LocalTime.now())
         }
@@ -354,7 +321,10 @@ fun TaskScreen(
                 painter = painterResource(id = R.drawable.outline_access_time_24),
                 contentDescription = null
             )
-            TextButton(onClick = { isChecked = !isChecked }) {
+            TextButton(onClick = {
+                isChecked = !isChecked
+                if (isChecked) startTime = LocalTime.of(14, 32)
+            }) {
                 Text(
                     text = "全天",
                     fontSize = 20.sp

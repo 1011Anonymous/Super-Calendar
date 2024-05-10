@@ -102,7 +102,7 @@ fun BirthdayScreen(
         eventViewModel.eventForInsert = Event(
             description = text,
             startDate = date,
-            startTime = LocalTime.of(9,0),
+            startTime = LocalTime.of(14,15),
             advance = eventViewModel.notificationWay2,
             repeat = "每年",
             category = 2

@@ -1,5 +1,13 @@
 package com.example.supercalendar.presentation.update_screen
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Intent
+import android.os.Build
+import android.provider.Settings
+import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,18 +46,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
+import com.example.supercalendar.MyAlarm
 import com.example.supercalendar.R
 import com.example.supercalendar.presentation.EventViewModel
 import com.example.supercalendar.presentation.components.AdvanceDialog2
 import com.example.supercalendar.ui.theme.taskTextStyle
 import com.example.supercalendar.utils.DateUtils
+import com.example.supercalendar.utils.TimeUtils
 import java.util.Calendar
 
+@RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BirthdayUpdate(
@@ -69,6 +81,56 @@ fun BirthdayUpdate(
     val desc = eventViewModel.eventForUpdate.description
     val date = eventViewModel.eventForUpdate.startDate
     val advance = eventViewModel.eventForUpdate.advance
+
+    var event = eventViewModel.eventForUpdate
+    val context = LocalContext.current
+    val newID = event.uniqueId!!
+    val contentTitle = when (event.category) {
+        0 -> "[提醒] ${event.description}"
+        1 -> "[日程] ${event.description}"
+        2 -> "[生日] ${event.description}"
+        else -> "[出行] ${event.description}"
+    }
+    val contentText = when (event.category) {
+        0 -> "${
+            event.startTime?.let {
+                TimeUtils.convertLocalTimeToString(
+                    it
+                )
+            }
+        }"
+
+        1 -> if (event.isAllDay == true) "${DateUtils.dateToString(event.startDate)} ~ ${
+            event.endDate?.let {
+                DateUtils.dateToString(
+                    it
+                )
+            }
+        }"
+        else "${DateUtils.dateToString(event.startDate)} ${
+            event.startTime?.let {
+                TimeUtils.convertLocalTimeToString(
+                    it
+                )
+            }
+        } ~ ${event.endDate?.let { DateUtils.dateToString(it) }} ${
+            event.endTime?.let {
+                TimeUtils.convertLocalTimeToString(
+                    it
+                )
+            }
+        }"
+
+        2 -> DateUtils.dateToString(event.startDate)
+        else -> "${
+            event.startTime?.let {
+                TimeUtils.convertLocalTimeToString(
+                    it
+                )
+            }
+        }"
+    }
+    val alarmManager = context.getSystemService(ComponentActivity.ALARM_SERVICE) as AlarmManager
 
     LaunchedEffect(key1 = true) {
         eventViewModel.getEventById(id)
@@ -112,6 +174,95 @@ fun BirthdayUpdate(
                 },
                 actions = {
                     IconButton(onClick = {
+                        when (event.advance) {
+                            "不提醒" -> {}
+                            "1天前" -> {
+                                eventViewModel.eventForUpdate.startTime?.let {
+                                    eventViewModel.updateNotifyForUpdate(
+                                        newValue1 = eventViewModel.eventForInsert.startDate.minusDays(1),
+                                        newValue2 = it
+                                    )
+                                }
+                            }
+                            "2天前" -> {
+                                eventViewModel.eventForUpdate.startTime?.let {
+                                    eventViewModel.updateNotifyForUpdate(
+                                        newValue1 = eventViewModel.eventForUpdate.startDate.minusDays(2),
+                                        newValue2 = it
+                                    )
+                                }
+                            }
+                            "3天前" -> {
+                                eventViewModel.eventForUpdate.startTime?.let {
+                                    eventViewModel.updateNotifyForUpdate(
+                                        newValue1 = eventViewModel.eventForUpdate.startDate.minusDays(3),
+                                        newValue2 = it
+                                    )
+                                }
+                            }
+                            "1周前" -> {
+                                eventViewModel.eventForUpdate.startTime?.let {
+                                    eventViewModel.updateNotifyForUpdate(
+                                        newValue1 = eventViewModel.eventForUpdate.startDate.minusDays(7),
+                                        newValue2 = it
+                                    )
+                                }
+                            }
+                            else -> {
+                                eventViewModel.updateNotifyForUpdate(
+                                    eventViewModel.eventForUpdate.startDate,
+                                    eventViewModel.eventForUpdate.startTime!!
+                                )
+                            }
+                        }
+                        event = eventViewModel.eventForUpdate
+                        val calendar = Calendar.getInstance().apply {
+                            timeInMillis = System.currentTimeMillis()
+                            event.notifyDate?.let { date ->
+                                event.notifyTime?.let {time ->
+                                    set(
+                                        date.year,
+                                        date.monthValue - 1,
+                                        date.dayOfMonth,
+                                        time.hour,
+                                        time.minute,
+                                        0
+                                    )
+                                }
+                            }
+                        }
+                        val alarmIntent: PendingIntent = Intent(context, MyAlarm::class.java).let { intent ->
+                            Log.d("AlarmSetup", "Sending Alarm with ID: $newID, Title: $contentTitle")
+
+                            intent.putExtra("RepeatType", 4)
+                            intent.putExtra("UniqueID", newID)
+                            intent.putExtra("ContentTitle", contentTitle)
+                            intent.putExtra("ContentText", contentText)
+
+                            PendingIntent.getBroadcast(
+                                context,
+                                newID,
+                                intent,
+                                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                            )
+                        }
+                        val alarmClockInfo = AlarmManager.AlarmClockInfo(
+                            calendar.timeInMillis,
+                            alarmIntent
+                        )
+                        if (alarmManager.canScheduleExactAlarms()) {
+                            alarmManager.setAlarmClock(
+                                alarmClockInfo,
+                                alarmIntent
+                            )
+                            Log.d("AlarmClock", "Clock Set")
+                        } else {
+                            context.startActivity(
+                                Intent(
+                                    Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                )
+                            )
+                        }
                         eventViewModel.updateEvent(eventViewModel.eventForUpdate)
                         onBack()
                     }) {
