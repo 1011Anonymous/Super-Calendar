@@ -1,5 +1,6 @@
 package com.example.supercalendar.presentation
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -76,6 +77,7 @@ class WeatherViewModel : ViewModel() {
 
 
 
+    @SuppressLint("DefaultLocale")
     fun getLocationByLatLng(latLng: LatLng) {
         viewModelScope.launch(Dispatchers.IO) {
             state = STATE.LOADING

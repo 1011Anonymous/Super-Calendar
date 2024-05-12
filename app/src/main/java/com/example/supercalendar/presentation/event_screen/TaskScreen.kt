@@ -98,8 +98,6 @@ fun TaskScreen(
         }
         val focusManager = LocalFocusManager.current
 
-        val formatter = remember { SimpleDateFormat("hh:mm a", Locale.getDefault()) }
-
         var isChecked by remember {
             mutableStateOf(false)
         }
