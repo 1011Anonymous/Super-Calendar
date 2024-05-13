@@ -35,5 +35,6 @@ data class WeatherCache(
     val pm25: String,
     val sunrise: String,
     val sunset: String,
+    val currentWindSpeed: String,
 
 )

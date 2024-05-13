@@ -148,12 +148,6 @@ fun WeatherCard(
                         .align(Alignment.CenterVertically)
                 )
 
-                /*
-                Spacer(modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(1f)
-                )
-                */
                 WeatherInfoSegment(
                     day = "后天",
                     weatherCondition = weatherViewModel.text2,
