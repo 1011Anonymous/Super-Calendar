@@ -7,6 +7,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.supercalendar.cache.CacheRepository
+import com.example.supercalendar.cache.model.WeatherCache
 import com.example.supercalendar.constant.Const.Companion.LOADING
 import com.example.supercalendar.constant.Const.Companion.UNKNOWN
 import com.example.supercalendar.constant.STATE
@@ -21,10 +23,15 @@ import com.example.supercalendar.retrofit_client.ForecastHourlyClient
 import com.example.supercalendar.retrofit_client.GeoRetrofitClient
 import com.example.supercalendar.retrofit_client.WeatherNowClient
 import com.google.android.gms.maps.model.LatLng
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class WeatherViewModel : ViewModel() {
+@HiltViewModel
+class WeatherViewModel @Inject constructor(
+    private val repository: CacheRepository
+) : ViewModel() {
     var state by mutableStateOf(STATE.LOADING)
 
     var errorMessage: String by mutableStateOf("")
@@ -38,7 +45,6 @@ class WeatherViewModel : ViewModel() {
 
     var locationName by mutableStateOf(UNKNOWN)
     var locationId by mutableStateOf("")
-
 
 
     //Now
@@ -75,6 +81,41 @@ class WeatherViewModel : ViewModel() {
     var category by mutableStateOf(LOADING)
     var pm25 by mutableStateOf(LOADING)
 
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            val cache = WeatherCache(
+                locationName = "绵阳",
+                currentTemp = "22",
+                tempMin0 = "16",
+                tempMax0 = "28",
+                currentText = "晴",
+                aqi = "74",
+                category = "良",
+                currentWindDir = "西南风",
+                currentWindScale = "1",
+                currentHumidity = "56",
+                text1 = "多云",
+                text2 = "多云",
+                windDir1 = "南风",
+                windDir2 = "南风",
+                windScale1 = "1-3",
+                windScale2 = "1-3",
+                tempMin1 = "18",
+                tempMin2 = "18",
+                tempMax1 = "29",
+                tempMax2 = "30",
+                icon1 = "101",
+                icon2 = "101",
+                currentIcon = "150",
+                feelsLike = "22",
+                pm25 = "36",
+                sunrise = "06:08",
+                sunset = "19:49",
+                currentWindSpeed = "2"
+            )
+            repository.insertCache(cache)
+        }
+    }
 
 
     @SuppressLint("DefaultLocale")

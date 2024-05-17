@@ -2,6 +2,9 @@ package com.example.supercalendar.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.supercalendar.cache.CacheDao
+import com.example.supercalendar.cache.CacheDatabase
+import com.example.supercalendar.cache.CacheRepository
 import com.example.supercalendar.constant.Const
 import com.example.supercalendar.data.EventRepository
 import com.example.supercalendar.data.local.EventDao
@@ -34,11 +37,29 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideCacheDatabase(@ApplicationContext context: Context): CacheDatabase {
+        return Room.databaseBuilder(
+            context,
+            CacheDatabase::class.java,
+            "cache.db"
+        ).build()
+    }
+
+    @Provides
+    @Singleton
     fun provideDao(db: EventDatabase): EventDao = db.eventDao()
 
     @Provides
     @Singleton
+    fun provideCacheDao(db: CacheDatabase): CacheDao = db.cacheDao()
+
+    @Provides
+    @Singleton
     fun provideRepository(dao: EventDao): EventRepository = EventRepository(dao)
+
+    @Provides
+    @Singleton
+    fun provideCacheRepository(dao: CacheDao): CacheRepository = CacheRepository(dao)
 
     @Provides
     @Singleton

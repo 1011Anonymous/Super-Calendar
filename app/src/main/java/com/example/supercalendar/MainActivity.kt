@@ -30,7 +30,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val locationViewModel: LocationViewModel by viewModels()
-    private val weatherViewModel: WeatherViewModel by viewModels()
+    private val weatherViewModel: WeatherViewModel by viewModels<WeatherViewModel>()
     private val homeViewModel: HomeViewModel by viewModels<HomeViewModel>()
     private val eventViewModel: EventViewModel by viewModels<EventViewModel>()
 
