@@ -28,7 +28,7 @@
 
 ## 预览
 
-![alt text](https://github.com/1011Anonymous/Super-Calendar/blob/main/README%20Images/Screenshot_20240517_132936.png)  ![alt text](https://github.com/1011Anonymous/Super-Calendar/blob/main/README%20Images/Screenshot_20240517_132949.png)
+![alt text](https://github.com/1011Anonymous/Super-Calendar/blob/main/README%20Images/Screenshot_20240517_132936.png?zoom=25%)  ![alt text](https://github.com/1011Anonymous/Super-Calendar/blob/main/README%20Images/Screenshot_20240517_132949.png?zoom=25%)
 
 
 
