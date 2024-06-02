@@ -28,13 +28,32 @@
 
 ## 预览
 
-<img src="C:\Users\Heisnberg\Pictures\Github\Screenshot_20240517_132936.png" alt="Screenshot_20240517_132936" style="zoom:25%;" />		<img src="C:\Users\Heisnberg\Pictures\Github\Screenshot_20240517_132949.png" alt="Screenshot_20240517_132949" style="zoom:25%;" />	
+<p>
+    <img src="https://github.com/1011Anonymous/Super-Calendar/blob/main/README%20Images/Screenshot_20240517_132936.png" alt="alt text" width="25%">
+    &nbsp;&nbsp;
+    <img src="https://github.com/1011Anonymous/Super-Calendar/blob/main/README%20Images/Screenshot_20240517_132949.png" alt="alt text" width="25%">
+</p>
 
-<img src="C:\Users\Heisnberg\Pictures\Github\Screenshot_20240517_133140.png" alt="Screenshot_20240517_133140" style="zoom:25%;" />		<img src="C:\Users\Heisnberg\Pictures\Github\Screenshot_20240517_133158.png" alt="Screenshot_20240517_133158" style="zoom:25%;" />	
+<p>
+    <img src="https://github.com/1011Anonymous/Super-Calendar/blob/main/README%20Images/Screenshot_20240517_133140.png" alt="alt text" width="25%">
+    &nbsp;&nbsp;
+    <img src="https://github.com/1011Anonymous/Super-Calendar/blob/main/README%20Images/Screenshot_20240517_133158.png" alt="alt text" width="25%">
+</p>
 
-<img src="C:\Users\Heisnberg\Pictures\Github\Screenshot_20240517_133209.png" alt="Screenshot_20240517_133209" style="zoom:25%;" />		<img src="C:\Users\Heisnberg\Pictures\Github\Screenshot_20240517_133506.png" alt="Screenshot_20240517_133506" style="zoom:25%;" />	
+<p>
+    <img src="https://github.com/1011Anonymous/Super-Calendar/blob/main/README%20Images/Screenshot_20240517_133209.png" alt="alt text" width="25%">
+    &nbsp;&nbsp;
+    <img src="https://github.com/1011Anonymous/Super-Calendar/blob/main/README%20Images/Screenshot_20240517_133250.png" alt="alt text" width="25%">
+</p>
 
-<img src="C:\Users\Heisnberg\Pictures\Github\Screenshot_20240517_133513.png" alt="Screenshot_20240517_133513" style="zoom:25%;" />		<img src="C:\Users\Heisnberg\Pictures\Github\Screenshot_20240517_133250.png" alt="Screenshot_20240517_133250" style="zoom:25%;" />	
+<p>
+    <img src="https://github.com/1011Anonymous/Super-Calendar/blob/main/README%20Images/Screenshot_20240517_133506.png" alt="alt text" width="25%">
+    &nbsp;&nbsp;
+    <img src="https://github.com/1011Anonymous/Super-Calendar/blob/main/README%20Images/Screenshot_20240517_133513.png" alt="alt text" width="25%">
+</p>
+
+
+
 
 
 
