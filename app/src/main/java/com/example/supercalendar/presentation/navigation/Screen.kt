@@ -2,6 +2,7 @@ package com.example.supercalendar.presentation.navigation
 
 enum class Screen {
     HomeScreen,
+    MemoScreen,
     SettingScreen,
     WeatherScreen,
     EventScreen,

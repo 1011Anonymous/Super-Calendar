@@ -18,6 +18,7 @@ import com.example.supercalendar.presentation.EventViewModel
 import com.example.supercalendar.presentation.HomeViewModel
 import com.example.supercalendar.presentation.LocationViewModel
 import com.example.supercalendar.presentation.WeatherViewModel
+import com.example.supercalendar.presentation.components.EventListScreen
 import com.example.supercalendar.presentation.detail_screen.BirthdayDetail
 import com.example.supercalendar.presentation.detail_screen.ReminderDetail
 import com.example.supercalendar.presentation.detail_screen.TaskDetail
@@ -58,6 +59,26 @@ fun AppNavigation(
                     navController.navigate("${Screen.ReminderDetailScreen.name}/$id")
                 }
             )
+        }
+
+        composable(
+            route = Screen.MemoScreen.name,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { -it },
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -it },
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            EventListScreen(eventViewModel = eventViewModel) {
+                navController.popBackStack()
+            }
         }
 
         composable(

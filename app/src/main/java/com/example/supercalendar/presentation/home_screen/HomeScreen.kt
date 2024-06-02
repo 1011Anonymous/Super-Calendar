@@ -102,18 +102,18 @@ fun HomeScreen(
                         }
                     }
 
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { navController.navigate(Screen.MemoScreen.name) }) {
                         Icon(imageVector = Icons.Filled.List, contentDescription = "Events")
                     }
                     IconButton(onClick = { navController.navigate(Screen.SettingScreen.name) }) {
                         Icon(imageVector = Icons.Filled.Settings, contentDescription = "Settings")
                     }
-                    IconButton(onClick = { /*TODO*/ }) {
+                    /*IconButton(onClick = { *//*TODO*//* }) {
                         Icon(
                             imageVector = Icons.Filled.MoreVert,
                             contentDescription = "MoreInfo"
                         )
-                    }
+                    }*/
                 },
             )
         },
