@@ -29,12 +29,10 @@ class HomeViewModel @Inject constructor(
     val hideWeather = userSettings.settingStatusFlow.map {
         it.isHideWeather
     }
-    //var hideWeather by mutableStateOf(false)
 
     val highlightWeekendsState = userSettings.settingStatusFlow.map {
         it.isHighlight
     }
-    //var highlightWeekendsState by mutableStateOf(false)
 
     val firstDayOfWeek = userSettings.settingStatusFlow.map {
         when (it.firstDayOfWeek) {
@@ -44,27 +42,22 @@ class HomeViewModel @Inject constructor(
             else -> DayOfWeek.MONDAY
         }
     }
-    //var firstDayOfWeek by mutableStateOf(DayOfWeek.MONDAY)
 
     val displayHoliday = userSettings.settingStatusFlow.map {
         it.isHoliday
     }
-    //var displayHoliday by mutableStateOf(true)
 
     val displayLunar = userSettings.settingStatusFlow.map {
         it.isLunar
     }
-    //var displayLunar by mutableStateOf(true)
 
     val displayFestival = userSettings.settingStatusFlow.map {
         it.isFestival
     }
-    //var displayFestival by mutableStateOf(true)
 
     val displayWeekday = userSettings.settingStatusFlow.map {
         it.isWeekday
     }
-    //var displayWeekday  by mutableStateOf(true)
 
     var selectedDate: LocalDate by mutableStateOf(LocalDate.now())
 

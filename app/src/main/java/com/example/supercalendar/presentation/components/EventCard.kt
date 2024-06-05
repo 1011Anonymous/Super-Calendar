@@ -50,16 +50,8 @@ fun EventCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            /*IconButton(
-                onClick = { onDone() },
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(imageVector = Icons.Rounded.Delete, contentDescription = null)
-            }*/
-
             Column(
                 modifier = Modifier.padding(start = 8.dp)
-                //.weight(8f)
             ) {
                 Text(
                     text = when (event.category) {
@@ -89,15 +81,6 @@ fun EventCard(
                 )
             }
 
-
-            /*IconButton(
-                onClick = { onUpdate(event.id) },
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(imageVector = Icons.Rounded.Edit, contentDescription = null)
-            }*/
-
-
         }
     }
 }
@@ -105,5 +88,4 @@ fun EventCard(
 @Preview
 @Composable
 fun PreviewCard() {
-    //EventCard()
 }

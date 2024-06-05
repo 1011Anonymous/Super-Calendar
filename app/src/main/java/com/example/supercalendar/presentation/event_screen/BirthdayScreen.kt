@@ -85,16 +85,6 @@ fun BirthdayScreen(
             mutableStateOf(false)
         }
 
-//        var dateText by remember {
-//            mutableStateOf("${LocalDate.now().year}年" +
-//                    "${LocalDate.now().monthValue}月" +
-//                    "${LocalDate.now().dayOfMonth}日" +
-//                    Const.chineseNumerals[LocalDate.now().dayOfWeek.value])
-//        }
-//        var dateISO by remember {
-//            mutableStateOf(LocalDate.now().toString())
-//        }
-
         var date by remember {
             mutableStateOf(LocalDate.now())
         }
@@ -122,8 +112,6 @@ fun BirthdayScreen(
                                 this.timeInMillis = datePickerState.selectedDateMillis!!
                             }
                             date = DateUtils.convertMillisToLocalDate(selectedDate.timeInMillis)
-//                            dateText = DateUtils.dateToString(localDate)
-//                            dateISO = DateUtils.dateToStringISO(localDate)
                             showDatePicker = false
                         }
                     ) { Text("确定") }

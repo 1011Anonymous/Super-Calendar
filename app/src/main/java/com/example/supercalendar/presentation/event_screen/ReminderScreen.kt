@@ -71,9 +71,8 @@ fun ReminderScreen(
     }
 
     val defaultNotification by eventViewModel.notification.collectAsState(initial = "")
-    //eventViewModel.updateNotificationWay1(defaultNotification)
 
-    LaunchedEffect(key1 = true) {  // key1 can be a specific condition or variable
+    LaunchedEffect(key1 = true) {
         eventViewModel.updateNotificationWay1(defaultNotification)
     }
 
@@ -105,28 +104,11 @@ fun ReminderScreen(
             mutableStateOf(false)
         }
 
-        /*
-        var dateText by remember {
-            mutableStateOf(
-                "${LocalDate.now().year}年" +
-                        "${LocalDate.now().monthValue}月" +
-                        "${LocalDate.now().dayOfMonth}日" +
-                        chineseNumerals[LocalDate.now().dayOfWeek.value]
-            )
-        }
-        var dateISO by remember {
-            mutableStateOf(LocalDate.now())
-        }
-        */
+
 
         var date by remember {
             mutableStateOf(LocalDate.now())
         }
-
-      //  val time = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault()).format(LocalTime.now())
-//        var timeText by remember {
-//            mutableStateOf(time)
-//        }
 
         var time by remember {
             mutableStateOf(LocalTime.now())
@@ -156,11 +138,6 @@ fun ReminderScreen(
                                 this.timeInMillis = datePickerState.selectedDateMillis!!
                             }
                             date = DateUtils.convertMillisToLocalDate(selectedDate.timeInMillis)
-//                            dateText = DateUtils.dateToString(localDate)
-//                            dateISO = DateUtils.dateToStringISO(localDate)
-//                            eventViewModel.updateYear(date.year)
-//                            eventViewModel.updateMonth(date.monthValue)
-//                            eventViewModel.updateDay(date.dayOfMonth)
                             showDatePicker = false
                         }
                     ) { Text("确定") }
@@ -188,8 +165,6 @@ fun ReminderScreen(
                             cal.set(Calendar.MINUTE, timePickerState.minute)
                             cal.isLenient = false
                             time = convertMillisToLocalTime(cal.timeInMillis)
-//                            eventViewModel.updateHour(time.hour)
-//                            eventViewModel.updateMinute(time.minute)
                             showTimePicker = false
                         }
                     ) { Text("确定") }

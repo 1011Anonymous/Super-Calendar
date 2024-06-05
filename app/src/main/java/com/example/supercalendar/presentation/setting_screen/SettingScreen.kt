@@ -209,7 +209,6 @@ fun SettingScreen(
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RectangleShape,
-                //contentPadding = PaddingValues(start = 0.dp, end = 215.dp)
             ) {
                 Text(
                     text = "高亮周末",
@@ -254,31 +253,6 @@ fun SettingScreen(
             }
             Spacer(modifier = Modifier.size(10.dp))
 
-            /*
-            TextButton(
-                onClick = { },
-                modifier = Modifier
-                    .fillMaxWidth(),
-                shape = RectangleShape,
-                contentPadding = PaddingValues(start = 0.dp, end = 262.dp)
-            ) {
-                Column {
-                    Text(
-                        text = "提醒方式",
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        style = bigTitleTextStyle
-                    )
-
-                    Text(
-                        text = "只通知栏提醒",
-                        color = Color.Gray,
-                        style = smallTitleTextStyle
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.size(15.dp))
-            */
-
             TextButton(
                 onClick = { },
                 modifier = Modifier
@@ -306,7 +280,6 @@ fun SettingScreen(
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RectangleShape,
-                //contentPadding = PaddingValues(start = 0.dp, end = 215.dp)
             ) {
                 Text(
                     text = "提醒震动",
@@ -326,7 +299,6 @@ fun SettingScreen(
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RectangleShape,
-                //contentPadding = PaddingValues(start = 0.dp, end = 215.dp)
             ) {
                 Text(
                     text = "隐藏事件",
@@ -363,7 +335,6 @@ fun SettingScreen(
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RectangleShape,
-                //contentPadding = PaddingValues(start = 0.dp, end = 215.dp)
             ) {
                 Text(
                     text = "隐藏天气",

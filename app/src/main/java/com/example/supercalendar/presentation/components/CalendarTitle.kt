@@ -47,7 +47,7 @@ fun CalendarTitle(
             modifier = Modifier
                 .weight(1f)
                 .testTag("MonthTitle")
-                .clickable(onClick = onClick),      //Triggering the dialog
+                .clickable(onClick = onClick),
             text = currentMonth.displayText(),
             fontSize = 22.sp,
             textAlign = TextAlign.Center,

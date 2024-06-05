@@ -172,8 +172,8 @@ fun AppNavigation(
 
         composable(
             route = "${Screen.UpdateTaskScreen.name}/{id}",
-            arguments = listOf(navArgument("id") {type = NavType.IntType})
-        ) {navBackStackEntry ->
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { navBackStackEntry ->
             TaskUpdate(
                 id = navBackStackEntry.arguments?.getInt("id")!!,
                 eventViewModel = eventViewModel
@@ -184,20 +184,22 @@ fun AppNavigation(
 
         composable(
             route = "${Screen.BirthdayDetailScreen.name}/{id}",
-            arguments = listOf(navArgument("id") {type = NavType.IntType})
-        ) {navBackStackEntry ->
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { navBackStackEntry ->
             BirthdayDetail(
                 id = navBackStackEntry.arguments?.getInt("id")!!,
                 eventViewModel = eventViewModel,
-                onBack = { navController.popBackStack() }) {id ->
-                navController.navigate("${Screen.UpdateBirthdayScreen.name}/$id")
-            }
+                onBack = { navController.popBackStack() },
+                onUpdate = { id ->
+                    navController.navigate("${Screen.UpdateBirthdayScreen.name}/$id")
+                }
+            )
         }
 
         composable(
             route = "${Screen.UpdateBirthdayScreen.name}/{id}",
-            arguments = listOf(navArgument("id") {type = NavType.IntType})
-        ) {navBackStackEntry ->
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { navBackStackEntry ->
             BirthdayUpdate(
                 id = navBackStackEntry.arguments?.getInt("id")!!,
                 eventViewModel = eventViewModel
@@ -208,21 +210,21 @@ fun AppNavigation(
 
         composable(
             route = "${Screen.TravelDetailScreen.name}/{id}",
-            arguments = listOf(navArgument("id") {type = NavType.IntType})
-        ) {navBackStackEntry ->
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { navBackStackEntry ->
             TravelDetail(
                 id = navBackStackEntry.arguments?.getInt("id")!!,
                 eventViewModel = eventViewModel,
                 onBack = { navController.popBackStack() }
-            ) {id ->
+            ) { id ->
                 navController.navigate("${Screen.UpdateTravelScreen.name}/$id")
             }
         }
 
         composable(
             route = "${Screen.UpdateTravelScreen.name}/{id}",
-            arguments = listOf(navArgument("id") {type = NavType.IntType})
-        ) {navBackStackEntry ->
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { navBackStackEntry ->
             TravelUpdate(
                 id = navBackStackEntry.arguments?.getInt("id")!!,
                 eventViewModel = eventViewModel

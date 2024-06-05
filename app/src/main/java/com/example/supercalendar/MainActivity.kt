@@ -52,8 +52,6 @@ class MainActivity : ComponentActivity() {
                         weatherViewModel.getLocationByLatLng(
                             latLng = locationViewModel.currentLocation.value,
                         )
-
-
                     })
             }
 
@@ -87,7 +85,6 @@ class MainActivity : ComponentActivity() {
             SuperCalendarTheme(
                 darkTheme = isDark
             ) {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

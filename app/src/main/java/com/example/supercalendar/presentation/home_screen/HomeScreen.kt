@@ -108,12 +108,6 @@ fun HomeScreen(
                     IconButton(onClick = { navController.navigate(Screen.SettingScreen.name) }) {
                         Icon(imageVector = Icons.Filled.Settings, contentDescription = "Settings")
                     }
-                    /*IconButton(onClick = { *//*TODO*//* }) {
-                        Icon(
-                            imageVector = Icons.Filled.MoreVert,
-                            contentDescription = "MoreInfo"
-                        )
-                    }*/
                 },
             )
         },
@@ -136,58 +130,6 @@ fun HomeScreen(
         eventViewModel.getEventsByDate(homeViewModel.selectedDate).collectAsState(
             initial = emptyList()
         )
-
-        /*
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxWidth()
-            //.verticalScroll(rememberScrollState())
-        ) {
-            CalendarView(homeViewModel = homeViewModel, eventViewModel = eventViewModel)
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            if (!selectedHideWeather) {
-                WeatherCard(navController = navController, weatherViewModel = weatherViewModel)
-            }
-
-            val events by
-            eventViewModel.getEventsByDate(homeViewModel.selectedDate).collectAsState(
-                initial = emptyList()
-            )
-
-            if (events.isNotEmpty()) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentPadding = PaddingValues(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(
-                        items = events,
-                        key = { item -> item.id }
-                    ) { event ->
-                        EventCard(
-                            event = event,
-                            onDone = {
-                                eventViewModel.deleteEvent(event)
-                                mySnackBar(
-                                    scope = scope,
-                                    snackbarHostState = snackbarHostState,
-                                    message = "撤销删除! -> \"${event.description}\"",
-                                    actionLabel = "UNDO",
-                                    onAction = { eventViewModel.undoDeleteEvent() }
-                                )
-                            },
-                            onUpdate = onUpdate
-                        )
-                    }
-                }
-            }
-
-        }
-        */
 
         LazyColumn(
             modifier = Modifier
@@ -220,16 +162,6 @@ fun HomeScreen(
                 ) { event ->
                     EventCard(
                         event = event,
-                        /*onDone = {
-                            eventViewModel.deleteEvent(event)
-                            mySnackBar(
-                                scope = scope,
-                                snackbarHostState = snackbarHostState,
-                                message = "撤销删除! -> \"${event.description}\"",
-                                actionLabel = "UNDO",
-                                onAction = { eventViewModel.undoDeleteEvent() }
-                            )
-                        },*/
                         navController = navController
                     )
                 }

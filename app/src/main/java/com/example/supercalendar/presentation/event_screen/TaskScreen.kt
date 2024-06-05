@@ -76,7 +76,7 @@ fun TaskScreen(
     }
 
     val defaultNotification by eventViewModel.schedule.collectAsState(initial = "")
-    LaunchedEffect(key1 = true) {  // key1 can be a specific condition or variable
+    LaunchedEffect(key1 = true) {
         eventViewModel.updateNotificationWay1(defaultNotification)
     }
 
@@ -169,8 +169,6 @@ fun TaskScreen(
                             }
                             startDate =
                                 DateUtils.convertMillisToLocalDate(selectedDate.timeInMillis)
-//                            startDateText = DateUtils.dateToString(localDate)
-//                            startDateISO = DateUtils.dateToStringISO(localDate)
                             showStartDatePicker = false
                         }
                     ) { Text("确定") }
@@ -197,8 +195,6 @@ fun TaskScreen(
                                 this.timeInMillis = datePickerState.selectedDateMillis!!
                             }
                             endDate = DateUtils.convertMillisToLocalDate(selectedDate.timeInMillis)
-//                            endDateText = DateUtils.dateToString(localDate)
-//                            endDateISO = DateUtils.dateToStringISO(localDate)
                             showEndDatePicker = false
                         }
                     ) { Text("确定") }
@@ -226,9 +222,6 @@ fun TaskScreen(
                             cal.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
                             cal.set(Calendar.MINUTE, timePickerState.minute)
                             cal.isLenient = false
-//                                startTimeText = DateTimeFormatter
-//                                    .ofPattern("HH:mm", Locale.getDefault())
-//                                    .format(convertMillisToLocalTime(cal.timeInMillis))
                             startTime = convertMillisToLocalTime(cal.timeInMillis)
 
                             showStartTimePicker = false
@@ -258,9 +251,6 @@ fun TaskScreen(
                             cal.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
                             cal.set(Calendar.MINUTE, timePickerState.minute)
                             cal.isLenient = false
-//                            endTimeText = DateTimeFormatter
-//                                .ofPattern("HH:mm", Locale.getDefault())
-//                                .format(convertMillisToLocalTime(cal.timeInMillis))
                             endTime = convertMillisToLocalTime(cal.timeInMillis)
 
                             showEndTimePicker = false

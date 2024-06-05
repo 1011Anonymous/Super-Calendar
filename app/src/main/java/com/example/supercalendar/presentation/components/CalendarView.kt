@@ -145,13 +145,11 @@ fun CalendarView(
                 coroutineScope.launch {
                     state.animateScrollToMonth(state.firstVisibleMonth.yearMonth.previousMonth)
 
-                    //homeViewModel.setVisibleMonth(visibleMonthInScrolling.yearMonth.previousMonth)
                 }
             },
             goToNext = {
                 coroutineScope.launch {
                     state.animateScrollToMonth(state.firstVisibleMonth.yearMonth.nextMonth)
-                    //homeViewModel.setVisibleMonth(visibleMonthInScrolling.yearMonth.nextMonth)
                 }
             },
             onClick = {
@@ -187,7 +185,6 @@ fun CalendarView(
             monthHeader = {
                 DaysOfWeekTitle(daysOfWeek = daysOfWeek)
             },
-            //userScrollEnabled = false
         )
     }
     MonthPicker(
@@ -197,7 +194,6 @@ fun CalendarView(
         confirmClicked = { month, year ->
             coroutineScope.launch {
                 state.scrollToMonth(YearMonth.of(year, month))
-                //homeViewModel.setVisibleMonth(YearMonth.of(year, month))
                 showDialog = false
             }
         },

@@ -90,7 +90,6 @@ fun SearchLocationDialog(
                                 if (city.isNotBlank()) {
                                     weatherViewModel.getLocationByName(city)
                                     onClose()
-                                    //focusManager.clearFocus()
                                 } else {
                                     Toast.makeText(
                                         context,
@@ -122,7 +121,6 @@ fun SearchLocationDialog(
                     if (city.isNotBlank()) {
                         weatherViewModel.getLocationByName(city)
                         onClose()
-                        //focusManager.clearFocus()
                     } else {
                         Toast.makeText(
                             context,

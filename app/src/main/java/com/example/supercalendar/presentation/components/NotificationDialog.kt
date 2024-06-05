@@ -47,90 +47,6 @@ fun NotificationDialog1(
                                     onClick = {
                                         selectedOption = option
                                         eventViewModel.updateNotificationWay1(option)
-                                        //println(eventViewModel.notificationWay1)
-                                        /*
-                                        when (option) {
-                                            "不提醒" -> {
-                                                eventViewModel.updateIsNotify(false)
-                                            }
-                                            "5分钟前" -> {
-                                                val scheduledTime = LocalDateTime.of(
-//                                                    eventViewModel.year,
-//                                                    eventViewModel.month,
-//                                                    eventViewModel.day,
-//                                                    eventViewModel.hour,
-//                                                    eventViewModel.minute
-                                                    eventViewModel.eventForInsert.startDate,
-                                                    eventViewModel.eventForInsert.startTime
-                                                )
-                                                val newTime = TimeUtils.subtractTimeFromDateTime(
-                                                    scheduledTime,
-                                                    5,
-                                                    0
-                                                )
-//                                                eventViewModel.updateYear(newTime.year)
-//                                                eventViewModel.updateMonth(newTime.monthValue)
-//                                                eventViewModel.updateDay(newTime.dayOfMonth)
-//                                                eventViewModel.updateHour(newTime.hour)
-//                                                eventViewModel.updateMinute(newTime.minute)
-                                                eventViewModel.updateNotifyForInsert(
-                                                    newTime.toLocalDate(),
-                                                    newTime.toLocalTime()
-                                                )
-                                            }
-                                            "15分钟前" -> {
-                                                val scheduledTime = LocalDateTime.of(
-                                                    eventViewModel.eventForInsert.startDate,
-                                                    eventViewModel.eventForInsert.startTime
-                                                )
-                                                val newTime = TimeUtils.subtractTimeFromDateTime(
-                                                    scheduledTime,
-                                                    15,
-                                                    0
-                                                )
-                                                eventViewModel.updateNotifyForInsert(
-                                                    newTime.toLocalDate(),
-                                                    newTime.toLocalTime()
-                                                )
-                                            }
-                                            "30分钟前" -> {
-                                                val scheduledTime = LocalDateTime.of(
-                                                    eventViewModel.eventForInsert.startDate,
-                                                    eventViewModel.eventForInsert.startTime
-                                                )
-                                                val newTime = TimeUtils.subtractTimeFromDateTime(
-                                                    scheduledTime,
-                                                    30,
-                                                    0
-                                                )
-                                                eventViewModel.updateNotifyForInsert(
-                                                    newTime.toLocalDate(),
-                                                    newTime.toLocalTime()
-                                                )
-                                            }
-                                            "1小时前" -> {
-                                                val scheduledTime = LocalDateTime.of(
-                                                    eventViewModel.eventForInsert.startDate,
-                                                    eventViewModel.eventForInsert.startTime
-                                                )
-                                                val newTime = TimeUtils.subtractTimeFromDateTime(
-                                                    scheduledTime,
-                                                    0,
-                                                    1
-                                                )
-                                                eventViewModel.updateNotifyForInsert(
-                                                    newTime.toLocalDate(),
-                                                    newTime.toLocalTime()
-                                                )
-                                            }
-                                            "任务发生时" -> {
-                                                eventViewModel.updateNotifyForInsert(
-                                                    eventViewModel.eventForInsert.startDate,
-                                                    eventViewModel.eventForInsert.startTime!!
-                                                )
-                                            }
-                                        }
-                                        */
                                         onClose()
                                     }
                                 )
@@ -182,43 +98,6 @@ fun NotificationDialog2(
                                     onClick = {
                                         selectedOption = option
                                         eventViewModel.updateNotificationWay2(option)
-                                        /*
-                                        when (option) {
-                                            "不提醒" -> {
-                                                eventViewModel.updateIsNotify(false)
-                                            }
-                                            "1天前" -> {
-                                                eventViewModel.updateNotifyForInsert(
-                                                    newValue1 = eventViewModel.eventForInsert.startDate.minusDays(1),
-                                                    newValue2 = LocalTime.of(9,0)
-                                                )
-                                            }
-                                            "2天前" -> {
-                                                eventViewModel.updateNotifyForInsert(
-                                                    newValue1 = eventViewModel.eventForInsert.startDate.minusDays(2),
-                                                    newValue2 = LocalTime.of(9,0)
-                                                )
-                                            }
-                                            "3天前" -> {
-                                                eventViewModel.updateNotifyForInsert(
-                                                    newValue1 = eventViewModel.eventForInsert.startDate.minusDays(3),
-                                                    newValue2 = LocalTime.of(9,0)
-                                                )
-                                            }
-                                            "1周前" -> {
-                                                eventViewModel.updateNotifyForInsert(
-                                                    newValue1 = eventViewModel.eventForInsert.startDate.minusDays(7),
-                                                    newValue2 = LocalTime.of(9,0)
-                                                )
-                                            }
-                                            else -> {
-                                                eventViewModel.updateNotifyForInsert(
-                                                    newValue1 = eventViewModel.eventForInsert.startDate,
-                                                    newValue2 = LocalTime.of(9,0)
-                                                )
-                                            }
-                                        }
-                                        */
                                         onClose()
                                     }
                                 )

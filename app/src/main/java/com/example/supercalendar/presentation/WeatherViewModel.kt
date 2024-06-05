@@ -47,7 +47,6 @@ class WeatherViewModel @Inject constructor(
     var locationId by mutableStateOf("")
 
 
-    //Now
     var currentTemp by mutableStateOf(LOADING)
     var feelsLike by mutableStateOf(LOADING)
     var currentText by mutableStateOf(LOADING)
@@ -57,7 +56,6 @@ class WeatherViewModel @Inject constructor(
     var currentWindSpeed by mutableStateOf(LOADING)
     var currentHumidity by mutableStateOf(LOADING)
 
-    //Daily
     var tempMax0 by mutableStateOf(LOADING)
     var tempMax1 by mutableStateOf(LOADING)
     var tempMax2 by mutableStateOf(LOADING)
@@ -76,7 +74,6 @@ class WeatherViewModel @Inject constructor(
     var sunset0 by mutableStateOf(LOADING)
     var uvIndex0 by mutableStateOf(LOADING)
 
-    //Air
     var aqi by mutableStateOf(LOADING)
     var category by mutableStateOf(LOADING)
     var pm25 by mutableStateOf(LOADING)

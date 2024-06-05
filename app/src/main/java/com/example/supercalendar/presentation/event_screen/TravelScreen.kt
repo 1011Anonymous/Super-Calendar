@@ -68,7 +68,7 @@ fun TravelScreen(eventViewModel: EventViewModel) {
     }
 
     val defaultNotification by eventViewModel.notification.collectAsState(initial = "")
-    LaunchedEffect(key1 = true) {  // key1 can be a specific condition or variable
+    LaunchedEffect(key1 = true) {
         eventViewModel.updateNotificationWay1(defaultNotification)
     }
 
@@ -240,10 +240,6 @@ fun TravelScreen(eventViewModel: EventViewModel) {
             onClick = { openNotification = true }
         ) {
             Text(text = eventViewModel.notificationWay1)
-            // 将EventViewModel添加到SettingScreen中方便设置默认提醒时间
-            // SettingScreen -> notificationWay1, notificationWay1-> text, NotificationDialog -> notificationWay1
-            // 在EventScreen中判断notificationWay1来进行获取提醒时间，删除NotificationDialog中判断提醒时间的部分
-            // 判断后，在EventScreen中最将notificationWay1恢复到设置中的值
             Spacer(modifier = Modifier.width(260.dp))
         }
         Divider(modifier = Modifier.padding(bottom = 20.dp))

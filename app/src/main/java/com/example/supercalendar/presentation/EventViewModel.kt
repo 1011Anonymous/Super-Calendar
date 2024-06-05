@@ -38,14 +38,12 @@ class EventViewModel @Inject constructor(
         Event(
             description = "",
             startDate = LocalDate.now(),
-            //notifyDate = LocalDate.now(),
-            //notifyTime = LocalTime.now(),
             advance = "",
             category = 0
         )
     )
 
-    //默认提醒时间
+
     val notification = userSettings.settingStatusFlow.map {
         it.notification
     }
@@ -57,7 +55,7 @@ class EventViewModel @Inject constructor(
     var notificationWay2 by mutableStateOf("")
     var intervalText by mutableStateOf("不重复")
 
-    //Alarm
+
     var isNotify by mutableStateOf(true)
     var isRepeat by mutableStateOf(false)
     var year by mutableIntStateOf(2024)
@@ -68,7 +66,7 @@ class EventViewModel @Inject constructor(
     var second by mutableIntStateOf(0)
     var interval by mutableLongStateOf(0)
 
-    //userSettings
+
 
     val getAllEvents = repository.getAllEvents()
     private var deletedEvent: Event? = null
